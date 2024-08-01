@@ -1,19 +1,45 @@
-cmake_minimum_required(VERSION 3.10) 
+cmake_minimum_required(VERSION 3.10)
 set(PROJECT_NAME Raygine)
+
 # Project name and version.
 project(${PROJECT_NAME} VERSION 0.1)
 
 # Set the C++ Standard.
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED true)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set default build to debug.
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+# Making sure debug symbols are included.
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+
+# Find SDL2 using pkg-config
+find_package(PkgConfig REQUIRED)
+# Finding pkgConfig, use this to populate SDL2 variable.
+# When found, it populates *_INCLUDE_DIRS and *_LIBRARIES.
+pkg_check_modules(SDL2 REQUIRED sdl2)
+
+# Include directories.
+include_directories(${PROJECT_SOURCE_DIR}/include
+                    ${SDL2_INCLUDE_DIRS})
+
 # Add source files.
 set(SRC_FILES ${PROJECT_SOURCE_DIR}/src/raymaster_driver.cpp)
 
 # Add executable
-add_executable(${PROJECT_NAME}  ${SRC_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+
+# Link SDL2 to the executable using the imported target
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+
+# Adding custom target to run the executable, "make run".
+add_custom_target(
+    run
+    COMMAND ${PROJECT_NAME}
+    DEPENDS ${PROJECT_NAME}
+    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+    COMMENT "Running ${PROJECT_NAME}..."
+)
