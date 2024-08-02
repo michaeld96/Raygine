@@ -1,11 +1,10 @@
 #include <SDL2/SDL.h>
 #include <iostream>
-// #include <string>
 
 class RaygineRenderer
 {
 private:
-    // Private constructor to make sure this is not initalized.
+    // Private constructor to make sure this is not initalized. **SINGLETON**
     RaygineRenderer() {}
     static inline const char* _raygine_window_name = "Raygine";
     static inline SDL_Window* _raygine_window = nullptr;
