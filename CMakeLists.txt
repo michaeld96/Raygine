@@ -32,7 +32,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include
                     ${SDL2_INCLUDE_DIRS})
 
 # Add source files.
-set(SRC_FILES ${PROJECT_SOURCE_DIR}/src/raymaster_driver.cpp)
+set(SRC_FILES ${PROJECT_SOURCE_DIR}/src/raygine_driver.cpp
+              ${PROJECT_SOURCE_DIR}/src/raygine_renderer.cpp)
 
 # Add executable
 add_executable(${PROJECT_NAME} ${SRC_FILES})
