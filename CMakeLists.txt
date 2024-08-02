@@ -16,11 +16,16 @@ endif()
 # Making sure debug symbols are included.
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 
-# Find SDL2 using pkg-config
-find_package(PkgConfig REQUIRED)
-# Finding pkgConfig, use this to populate SDL2 variable.
-# When found, it populates *_INCLUDE_DIRS and *_LIBRARIES.
-pkg_check_modules(SDL2 REQUIRED sdl2)
+# Find SDL2
+if (APPLE)
+    find_package(SDL2 REQUIRED)
+elseif (UNIX)
+    # Find SDL2 using pkg-config
+    find_package(PkgConfig REQUIRED)
+    # Finding pkgConfig, use this to populate SDL2 variable.
+    # When found, it populates *_INCLUDE_DIRS and *_LIBRARIES.
+    pkg_check_modules(SDL2 REQUIRED sdl2)
+endif()
 
 # Include directories.
 include_directories(${PROJECT_SOURCE_DIR}/include
