@@ -1,5 +1,3 @@
-#ignore vscode dir.
-.vscode
 # ignore build folder.
 build
 # ignore the .exe
