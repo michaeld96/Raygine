@@ -1,5 +1,10 @@
 {
     "cSpell.words": [
         "Raygine"
-    ]
+    ],
+    "files.associations": {
+        "*.cu": "cuda-cpp",
+        "*.rmd": "markdown",
+        "vector": "cpp"
+    }
 }
