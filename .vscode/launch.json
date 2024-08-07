@@ -19,7 +19,7 @@
             "name": "Debug Game Engine - Linux",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/game_engine_linux",
+            "program": "${workspaceFolder}/build/Raygine",
             "args": [], // Command line arguments passed to the program.
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
