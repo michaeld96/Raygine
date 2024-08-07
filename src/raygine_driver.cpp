@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <vector>
+#include <cmath>
 #include "../include/raygine_renderer.hpp"
 
 void InitSDL();
@@ -46,13 +47,30 @@ void draw_map()
     }
 }
 
+void draw_player(float player_x, float player_y, float player_dir_x, float player_dir_y)
+{
+    SDL_FRect player_r = { player_x, player_y, 5, 5 };
+    RaygineRenderer::SetDrawColor(255, 50, 0, 255);
+    SDL_RenderFillRectF(RaygineRenderer::GetRenderer(), &player_r);
+
+    // Calculate the end point of the direction line
+    float line_length = 20.0f; // Length of the direction line
+    float end_x = player_x + player_dir_x * line_length;
+    float end_y = player_y + player_dir_y * line_length;
+
+    // Draw the direction line
+    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255); // Green color for the direction line
+    SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
+}
+
 int main()
 {
-    float player_x = 0.0f;
-    float player_y = 0.0f;
-    SDL_Rect me = {
+    float player_pos_x = 145.0f;
+    float player_pos_y = 85.0f;
+    float player_dir_x = 0.0f;
+    float player_dir_y = 1.0f;
+    const float rotation_speed = 0.1f;
 
-    };
     InitSDL();
     RaygineRenderer::InitWindow(window_width, window_height);
     RaygineRenderer::CreateRenderer();
@@ -74,17 +92,27 @@ int main()
             {
                 switch (e.key.keysym.sym)
                 {
-                    case SDLK_w:
-                        player_y -= 5;
+                    case SDLK_w: // Move forward
+                        player_pos_x += player_dir_x * 1.5;
+                        player_pos_y += player_dir_y * 1.5;
                         break;
-                    case SDLK_s:
-                        player_y += 5;
+                    case SDLK_s: // Move backward
+                        player_pos_x -= player_dir_x * 1.5;
+                        player_pos_y -= player_dir_y * 1.5;
                         break;
-                    case SDLK_a:
-                        player_x -= 5;
+                    case SDLK_a: // Rotate left (counter-clockwise)
+                        {
+                            float old_dir_x = player_dir_x;
+                            player_dir_x = player_dir_x * cos(-rotation_speed) - player_dir_y * sin(-rotation_speed);
+                            player_dir_y = old_dir_x * sin(-rotation_speed) + player_dir_y * cos(-rotation_speed);
+                        }
                         break;
-                    case SDLK_d:
-                        player_x += 5;
+                    case SDLK_d: // Rotate right (clockwise) <- from a rotation matrix.
+                        {
+                            float old_dir_x = player_dir_x;
+                            player_dir_x = player_dir_x * cos(rotation_speed) - player_dir_y * sin(rotation_speed);
+                            player_dir_y = old_dir_x * sin(rotation_speed) + player_dir_y * cos(rotation_speed);
+                        }
                         break;
                 }
             }
@@ -93,20 +121,15 @@ int main()
         // render
         RaygineRenderer::SetDrawColor(0, 0, 0, 255);
         RaygineRenderer::ClearRenderer();
-        // RaygineRenderer::SetDrawColor(255, 255, 255, 255);
-        // SDL_Rect r = {
-        //     static_cast<int>(player_x),
-        //     static_cast<int>(player_y),
-        //     20,
-        //     20
-        // };
-        // SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &r);
         draw_map();
+        draw_player(player_pos_x, player_pos_y, player_dir_x, player_dir_y);
+        std::cout << "x: " << player_pos_x << ", y: " << player_pos_y << "\n";
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
     
     RaygineRenderer::DestroyRender();
     RaygineRenderer::DestroyWindow();
+    SDL_Quit();
     return 0;
 }
 
