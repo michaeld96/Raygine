@@ -54,13 +54,13 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
     SDL_RenderFillRectF(RaygineRenderer::GetRenderer(), &player_r);
 
     // Calculate the end point of the direction line
-    float line_length = 20.0f; // Length of the direction line
-    float end_x = player_x + player_dir_x * line_length;
-    float end_y = player_y + player_dir_y * line_length;
+    // float line_length = 20.0f; // Length of the direction line
+    // float end_x = player_x + player_dir_x * line_length;
+    // float end_y = player_y + player_dir_y * line_length;
 
-    // Draw the direction line
-    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255); // Green color for the direction line
-    SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
+    // // Draw the direction line
+    // SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255); // Green color for the direction line
+    // SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
 }
 
 void cast_ray(float player_x, float player_y, float dir_x, float dir_y) {
