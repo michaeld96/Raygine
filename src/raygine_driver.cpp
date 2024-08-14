@@ -63,6 +63,12 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
 }
 
+void dda(float player_x_pos, float player_y_pos, float player_dir_x, float player_dir_y)
+{
+    // calculate length of Sx and Sy and see which one is smaller.
+    
+}
+
 int main()
 {
     float player_pos_x = 145.0f;
