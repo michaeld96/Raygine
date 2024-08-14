@@ -63,11 +63,63 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
 }
 
-void dda(float player_x_pos, float player_y_pos, float player_dir_x, float player_dir_y)
-{
-    // calculate length of Sx and Sy and see which one is smaller.
-    
+void cast_ray(float player_x, float player_y, float dir_x, float dir_y) {
+    int mapX = static_cast<int>(player_x / cell_size);
+    int mapY = static_cast<int>(player_y / cell_size);
+
+    float rayDirX = dir_x;
+    float rayDirY = dir_y;
+
+    float deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
+    float deltaDistY = (rayDirY == 0) ? 1e30 : std::abs(1 / rayDirY);
+
+    int stepX, stepY;
+    float sideDistX, sideDistY;
+
+    if (rayDirX < 0) {
+        stepX = -1;
+        sideDistX = (player_x - mapX * cell_size) * deltaDistX;
+    } else {
+        stepX = 1;
+        sideDistX = (mapX * cell_size + cell_size - player_x) * deltaDistX;
+    }
+    if (rayDirY < 0) {
+        stepY = -1;
+        sideDistY = (player_y - mapY * cell_size) * deltaDistY;
+    } else {
+        stepY = 1;
+        sideDistY = (mapY * cell_size + cell_size - player_y) * deltaDistY;
+    }
+
+    bool hit = false;
+    int side;
+    while (!hit) {
+        if (sideDistX < sideDistY) {
+            sideDistX += deltaDistX;
+            mapX += stepX;
+            side = 0;
+        } else {
+            sideDistY += deltaDistY;
+            mapY += stepY;
+            side = 1;
+        }
+        if (map[mapY][mapX] > 0) hit = true;
+    }
+
+    float perpWallDist;
+    if (side == 0)
+        perpWallDist = (mapX * cell_size - player_x + (1 - stepX) * cell_size / 2) / rayDirX;
+    else
+        perpWallDist = (mapY * cell_size - player_y + (1 - stepY) * cell_size / 2) / rayDirY;
+
+    float impactX = player_x + rayDirX * perpWallDist;
+    float impactY = player_y + rayDirY * perpWallDist;
+
+    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255);
+    SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, impactX, impactY);
 }
+
+
 
 int main()
 {
@@ -129,7 +181,8 @@ int main()
         RaygineRenderer::ClearRenderer();
         draw_map();
         draw_player(player_pos_x, player_pos_y, player_dir_x, player_dir_y);
-        std::cout << "x: " << player_pos_x << ", y: " << player_pos_y << "\n";
+        std::cout << "x: " << player_pos_x << ", y: " << player_pos_y << ", x_dir: " << player_dir_x << ", y_dir: " << player_dir_y << "\n";
+        cast_ray(player_pos_x, player_pos_y, player_dir_x, player_dir_y);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
     
