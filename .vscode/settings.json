@@ -5,6 +5,7 @@
     "files.associations": {
         "*.cu": "cuda-cpp",
         "*.rmd": "markdown",
-        "vector": "cpp"
+        "vector": "cpp",
+        "random": "cpp"
     }
 }
