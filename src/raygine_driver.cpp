@@ -161,6 +161,7 @@ int main()
             }
         }
         // update
+        // todo.
         // render
         RaygineRenderer::SetDrawColor(0, 0, 0, 255);
         RaygineRenderer::ClearRenderer();
