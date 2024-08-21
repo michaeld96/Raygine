@@ -138,7 +138,10 @@ int main()
                     case SDLK_a: // Rotate left (counter-clockwise)
                     {
                         player_angle += 5; // Adjust rotation speed as needed
-                        if (player_angle >= 360) player_angle -= 360;
+                        if (player_angle >= 360) 
+                        {
+                            player_angle -= 360;
+                        }
                         player_delta_x = cos(degree_to_rad(player_angle));
                         player_delta_y = -sin(degree_to_rad(player_angle));
                     }
@@ -146,7 +149,10 @@ int main()
                     case SDLK_d:  // Rotate right (clockwise)
                     {
                         player_angle -= 5; // Adjust rotation speed as needed
-                        if (player_angle < 0) player_angle += 360;
+                        if (player_angle < 0) 
+                        {
+                            player_angle += 360;
+                        }
                         player_delta_x = cos(degree_to_rad(player_angle));
                         player_delta_y = -sin(degree_to_rad(player_angle));
                     }
