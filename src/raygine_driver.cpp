@@ -24,29 +24,6 @@ float degree_to_rad(float &in_degree)
     return (in_degree) * (PI / 180);
 }
 
-
-
-
-
-// std::vector<std::vector<int>> map = {
-//     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1},
-//     {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1},
-//     {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1},
-//     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1},
-//     {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
-//     {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-// };
-
 std::vector<std::vector<int>> map = {
     {1, 1, 1, 1, 1},
     {1, 0, 0, 0, 1},
@@ -100,7 +77,6 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
     // Horizontal grid check.
     if (degree_to_rad(ray_angle) > PI) // Player is looking down.
     {
-        // ray_y = ((int)(player_y / cell_size)) * cell_size; // round down to nearest cell size.
         ray_y = ((int)(player_y / cell_size)) * cell_size + cell_size; // round up tp nearest cell.
         ray_x = player_x + (player_y - ray_y) / tan(degree_to_rad(ray_angle));
     }
