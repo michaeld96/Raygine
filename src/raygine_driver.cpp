@@ -98,12 +98,22 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
     float ray_angle = player_angle;
     float ray_x, ray_y, x_offset, y_offset = 0.0f;
     // Horizontal grid check.
-    if (ray_angle > PI) // Player is looking down.
+    if (degree_to_rad(ray_angle) > PI) // Player is looking down.
     {
         // ray_y = ((int)(player_y / cell_size)) * cell_size; // round down to nearest cell size.
         ray_y = ((int)(player_y / cell_size)) * cell_size + cell_size; // round up tp nearest cell.
         ray_x = player_x + (player_y - ray_y) / tan(degree_to_rad(ray_angle));
+    }
+    if (degree_to_rad(ray_angle) < PI) // Player is looking up.
+    {
+        ray_y = ((int)(player_y / cell_size)) * cell_size; // Round down to nearest cell.
+        ray_x = player_x + (player_y - ray_y) / tan(degree_to_rad(ray_angle));
     } 
+    if (degree_to_rad(ray_angle) == 0 || degree_to_rad(ray_angle) == PI)
+    {
+        ray_x = player_x; 
+        ray_y = player_y;
+    }
     SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255);
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
 }
