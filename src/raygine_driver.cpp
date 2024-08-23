@@ -91,6 +91,29 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         ray_y = player_y;
     }
     SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255);
+    // SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
+    const int line_thickness = 5;
+    // Draw multiple lines to simulate a thicker line
+    for (int i = -line_thickness / 2; i <= line_thickness / 2; ++i) {
+        SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x + i, player_y, ray_x + i, ray_y);
+    }
+    // Vertical line check.
+    if (degree_to_rad(ray_angle) < (PI/2) || degree_to_rad(ray_angle) > (3*PI / 2)) // Player is looking right.
+    {
+        ray_x = ((int)(player_x / cell_size)) * cell_size + cell_size; // round up tp nearest cell.
+        ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
+    }
+    if (degree_to_rad(ray_angle) > (PI/2) && degree_to_rad(ray_angle) < (3*PI / 2)) // Player is looking left.
+    {
+        ray_x = ((int)(player_x / cell_size)) * cell_size; // Round down to nearest cell.
+        ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
+    } 
+    if (degree_to_rad(ray_angle) == (PI / 2) || degree_to_rad(ray_angle) == (3*PI / 2))
+    {
+        ray_x = player_x; 
+        ray_y = player_y;
+    }
+    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255);
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
 }
 
