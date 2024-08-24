@@ -4,6 +4,7 @@
 #include <cmath>
 #include "../include/raygine_renderer.hpp"
 #include <utility> // For std::pair.
+#include <limits>
 
 const int window_width = 800;
 const int window_height = 600;
@@ -39,6 +40,11 @@ std::vector<std::vector<int>> map = {
     {1, 1, 1, 1, 1}
 };
 
+float distance_formula(float x1, float y1, float x2, float y2)
+{
+    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+}
+
 
 
 
@@ -64,7 +70,7 @@ void draw_map()
 void draw_player(float player_x, float player_y, float player_dir_x, float player_dir_y)
 {
     SDL_FRect player_r = { player_x, player_y, 5, 5 };
-    RaygineRenderer::SetDrawColor(255, 50, 0, 255);
+    RaygineRenderer::SetDrawColor(255, 0, 0, 255);
     SDL_RenderFillRectF(RaygineRenderer::GetRenderer(), &player_r);
 
     // Calculate the end point of the direction line
@@ -73,7 +79,7 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
     float end_y = player_y + player_dir_y * line_length;
 
     // Draw the direction line
-    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255); // Green color for the direction line
+    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255); // Green color for the direction line
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
 }
 
@@ -82,6 +88,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
     bool hit_wall = false;
     float ray_angle = player_angle;
     float ray_x = 0.0f, ray_y = 0.0f, x_offset = 0.0f, y_offset = 0.0f;
+    float horizontal_ray_x = 0.0f, horizontal_ray_y = 0.0f, horizontal_distance = std::numeric_limits<float>::max();
     // Horizontal grid check.
     if (degree_to_rad(ray_angle) == 0 || degree_to_rad(ray_angle) == PI)
     {
@@ -97,46 +104,86 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
     }
     else if (degree_to_rad(ray_angle) < PI) // Player is looking up.
     {
-        ray_y = ((int)(player_y / cell_size)) * cell_size; // Round down to nearest cell.
+        ray_y = (((int)(player_y / cell_size)) * cell_size) - 0.001; // Round down to nearest cell.
         ray_x = player_x + (player_y - ray_y) / tan(degree_to_rad(ray_angle));
         y_offset = -cell_size;
-        x_offset = -cell_size * (1 / tan(degree_to_rad(ray_angle)));
+        x_offset = cell_size * (1 / tan(degree_to_rad(ray_angle)));
     } 
-    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255);
-    // SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
-    // Vertical line check.
-    // if (degree_to_rad(ray_angle) == (PI / 2) || degree_to_rad(ray_angle) == (3*PI / 2))
-    // {
-    //     ray_x = player_x; 
-    //     ray_y = player_y;
-    // }
-    // else if (degree_to_rad(ray_angle) < (PI/2) || degree_to_rad(ray_angle) > (3*PI / 2)) // Player is looking right.
-    // {
-    //     ray_x = ((int)(player_x / cell_size)) * cell_size + cell_size; // round up tp nearest cell.
-    //     ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
-    // }
-    // else if (degree_to_rad(ray_angle) > (PI/2) && degree_to_rad(ray_angle) < (3*PI / 2)) // Player is looking left.
-    // {
-    //     ray_x = ((int)(player_x / cell_size)) * cell_size; // Round down to nearest cell.
-    //     ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
-    // } 
-    // SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255);
-    
-    while (!hit_wall)
+    int counter = 0;
+    while (!hit_wall && counter != 10)
     {
         std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
         int int_ray_x = int_ray.first;
         int int_ray_y = int_ray.second;
-        if (map[int_ray_x][int_ray_y] == 1)
+        if ((int_ray_x < map.size() && int_ray_y < map.size()) && map[int_ray_x][int_ray_y] == 1)
         {
-            hit_wall = true;
+            counter = 10;
+            std::cout << "HIT WALL!\n";
+            horizontal_ray_x = ray_x;
+            horizontal_ray_y = ray_y;
+            horizontal_distance = distance_formula(ray_x, ray_y, player_x, player_y);
         }
         else
         {
             ray_x += x_offset;
             ray_y += y_offset;
+            counter++;
         }
     }
+    float vertical_ray_x = 0.0f, vertical_ray_y = 0.0f, vertical_distance = std::numeric_limits<float>::max();;
+    // Vertical line check.
+    if (degree_to_rad(ray_angle) == (PI / 2) || degree_to_rad(ray_angle) == (3*PI / 2))
+    {
+        ray_x = player_x; 
+        ray_y = player_y;
+    }
+    else if (degree_to_rad(ray_angle) < (PI/2) || degree_to_rad(ray_angle) > (3*PI / 2)) // Player is looking right.
+    {
+        ray_x = ((int)(player_x / cell_size)) * cell_size + cell_size; // round up tp nearest cell.
+        ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
+        y_offset = -cell_size * tan(degree_to_rad(ray_angle));
+        x_offset = cell_size;
+    }
+    else if (degree_to_rad(ray_angle) > (PI/2) && degree_to_rad(ray_angle) < (3*PI / 2)) // Player is looking left.
+    {
+        ray_x = (((int)(player_x / cell_size)) * cell_size) - 0.001; // Round down to nearest cell.
+        ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
+        y_offset = cell_size * tan(degree_to_rad(ray_angle));
+        x_offset = -cell_size;
+    } 
+    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255);
+    counter = 0;
+    while (counter != 10)
+    {
+        std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
+        int int_ray_x = int_ray.first;
+        int int_ray_y = int_ray.second;
+        if ((int_ray_x < map.size() && int_ray_y < map.size()) && map[int_ray_x][int_ray_y] == 1)
+        {
+            counter = 10;
+            std::cout << "HIT WALL!\n";
+            vertical_ray_x = ray_x;
+            vertical_ray_y = ray_y;
+            vertical_distance = distance_formula(ray_x, ray_y, player_x, player_y);
+        }
+        else
+        {
+            ray_x += x_offset;
+            ray_y += y_offset;
+            counter++;
+        }
+    }
+    if (vertical_distance < horizontal_distance)
+    {
+        ray_x = vertical_ray_x;
+        ray_y = vertical_ray_y;
+    }
+    else
+    {
+        ray_x = horizontal_ray_x;
+        ray_y = horizontal_ray_y;
+    }
+    std::cout << "Ray coordinates: (" << ray_x << ", " << ray_y << ")" << std::endl;
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
 }
 
@@ -184,7 +231,7 @@ int main()
                     break;
                     case SDLK_a: // Rotate left (counter-clockwise)
                     {
-                        player_angle += 5; // Adjust rotation speed as needed
+                        player_angle += 2; // Adjust rotation speed as needed
                         if (player_angle >= 360) 
                         {
                             player_angle -= 360;
@@ -195,7 +242,7 @@ int main()
                     break;
                     case SDLK_d:  // Rotate right (clockwise)
                     {
-                        player_angle -= 5; // Adjust rotation speed as needed
+                        player_angle -= 2; // Adjust rotation speed as needed
                         if (player_angle < 0) 
                         {
                             player_angle += 360;
