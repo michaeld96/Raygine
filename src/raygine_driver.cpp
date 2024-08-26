@@ -6,6 +6,8 @@
 #include <utility> // For std::pair.
 #include <limits>
 
+#define DEBUG
+
 const int window_width = 800;
 const int window_height = 600;
 // const int cell_size = 20;
@@ -97,7 +99,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
     }
     else if (degree_to_rad(ray_angle) > PI) // Player is looking down.
     {
-        ray_y = ((int)(player_y / cell_size)) * cell_size + cell_size; // round up tp nearest cell.
+        ray_y = ((int)(player_y / cell_size)) * cell_size + cell_size; // Round up to nearest cell.
         ray_x = player_x + (player_y - ray_y) / tan(degree_to_rad(ray_angle));
         y_offset = cell_size;
         x_offset = -cell_size * (1 / tan(degree_to_rad(ray_angle)));
@@ -118,7 +120,9 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         if ((int_ray_x < map.size() && int_ray_y < map.size()) && map[int_ray_x][int_ray_y] == 1)
         {
             counter = 10;
+            #ifdef DEBUG
             std::cout << "HIT WALL!\n";
+            #endif
             horizontal_ray_x = ray_x;
             horizontal_ray_y = ray_y;
             horizontal_distance = distance_formula(ray_x, ray_y, player_x, player_y);
@@ -161,7 +165,9 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         if ((int_ray_x < map.size() && int_ray_y < map.size()) && map[int_ray_x][int_ray_y] == 1)
         {
             counter = 10;
+            #ifdef DEBUG
             std::cout << "HIT WALL!\n";
+            # endif
             vertical_ray_x = ray_x;
             vertical_ray_y = ray_y;
             vertical_distance = distance_formula(ray_x, ray_y, player_x, player_y);
@@ -261,8 +267,10 @@ int main()
         RaygineRenderer::ClearRenderer();
         draw_map();
         draw_player(player_pos_x, player_pos_y, player_delta_x, player_delta_y);
+        #ifdef DEBUG
         std::cout << "x: " << player_pos_x << ", y: " << player_pos_y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player_delta_x << ", delta_y: " << player_delta_y << std::endl;
+        #endif
         DrawRay(player_pos_x, player_pos_y, player_delta_x, player_delta_y, player_angle);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
