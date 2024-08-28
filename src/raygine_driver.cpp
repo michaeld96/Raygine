@@ -218,8 +218,22 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
         // Draw wall.
         float thirty_degrees = -30.0f;
-        float projection_plane_distance = (window_width / 2) / tan(degree_to_rad(thirty_degrees)); // Adjust for your FOV.
-        float wall_height = (cell_size * projection_plane_distance) / shortest_distance;
+
+        // fix fisheye?
+        float correct_fisheye_angle = player_angle - ray_angle;
+        if (correct_fisheye_angle < 0)
+        {
+            correct_fisheye_angle += 360;
+        }
+        else if (correct_fisheye_angle > 360)
+        {
+            correct_fisheye_angle -= 360;
+        }
+
+        shortest_distance = shortest_distance * cos(degree_to_rad(correct_fisheye_angle));
+
+        // float projection_plane_distance = (window_width / 2) / tan(degree_to_rad(thirty_degrees)); // Adjust for your FOV.
+        float wall_height = (cell_size * window_width) / shortest_distance;
         // Clamp wall height to the screen.
         if (wall_height > window_height) wall_height = window_height;
 
@@ -274,7 +288,8 @@ int main()
     float player_angle = 0.0f;
 
     InitSDL();
-    RaygineRenderer::InitWindow(1200, window_height);
+    RaygineRenderer::InitWindow(1200, 1200); 
+    // RaygineRenderer::InitWindow(window_width, window_height); // TODO: FIX ME!!!
     RaygineRenderer::CreateRenderer();
     draw_map();
     // todo, make input manager.
@@ -336,12 +351,13 @@ int main()
         RaygineRenderer::SetDrawColor(0, 0, 0, 255);
         RaygineRenderer::ClearRenderer();
         draw_map();
-        draw_player(player_pos_x, player_pos_y, player_delta_x, player_delta_y);
+        // draw_player(player_pos_x, player_pos_y, player_delta_x, player_delta_y);
         #ifdef DEBUG
         std::cout << "x: " << player_pos_x << ", y: " << player_pos_y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player_delta_x << ", delta_y: " << player_delta_y << std::endl;
         #endif
         DrawRay(player_pos_x, player_pos_y, player_delta_x, player_delta_y, player_angle);
+        draw_player(player_pos_x, player_pos_y, player_delta_x, player_delta_y);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
     
