@@ -34,12 +34,20 @@ std::pair<int, int> ray_to_map_coordinates(float ray_x, float ray_y, int unit_si
     return std::make_pair(int_ray_x, int_ray_y);
 }
 
+// std::vector<std::vector<int>> map = {
+//     {1, 1, 1, 1, 1},
+//     {1, 0, 0, 0, 1},
+//     {1, 0, 0, 0, 1},
+//     {1, 0, 0, 0, 1},
+//     {1, 1, 1, 1, 1}
+// };
+
 std::vector<std::vector<int>> map = {
-    {1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 1},
-    {1, 0, 0, 0, 1},
-    {1, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1}
+    {1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 0, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1}
 };
 
 float distance_formula(float x1, float y1, float x2, float y2)
@@ -117,7 +125,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
         int int_ray_x = int_ray.first;
         int int_ray_y = int_ray.second;
-        if ((int_ray_x < map.size() && int_ray_y < map.size()) && map[int_ray_x][int_ray_y] == 1)
+        if ((int_ray_y < map.size() && int_ray_x < map[int_ray_y].size()) && map[int_ray_y][int_ray_x] == 1)
         {
             counter = 10;
             #ifdef DEBUG
@@ -162,7 +170,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
         int int_ray_x = int_ray.first;
         int int_ray_y = int_ray.second;
-        if ((int_ray_x < map.size() && int_ray_y < map.size()) && map[int_ray_x][int_ray_y] == 1)
+        if ((int_ray_y < map.size() && int_ray_x < map[int_ray_y].size()) && map[int_ray_y][int_ray_x] == 1)
         {
             counter = 10;
             #ifdef DEBUG
