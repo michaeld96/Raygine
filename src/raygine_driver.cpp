@@ -198,19 +198,23 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
                 counter++;
             }
         }
-
+        Uint8 red = 255;
         if (vertical_distance < horizontal_distance)
         {
             ray_x = vertical_ray_x;
             ray_y = vertical_ray_y;
             shortest_distance = vertical_distance;
+            // Uint8 red = 255;
         }
         else
         {
             ray_x = horizontal_ray_x;
             ray_y = horizontal_ray_y;
             shortest_distance = horizontal_distance;
+            red = 150;
         }
+
+        SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
 
         // Draw 3D projection
         float correction_angle = player_angle - ray_angle;
@@ -236,7 +240,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         float shading_factor = std::clamp(1.0f - (shortest_distance / max_distance), 0.3f, 1.0f); // Clamped to ensure it doesn't get too dark
 
         // Calculate the shaded color (darker when further away)
-        Uint8 red = static_cast<Uint8>(255 * shading_factor);
+        // Uint8 red = static_cast<Uint8>(255 * shading_factor);
         Uint8 green = static_cast<Uint8>(0 * shading_factor);  // Adjust green if needed
         Uint8 blue = static_cast<Uint8>(0 * shading_factor);   // Adjust blue if needed
 
