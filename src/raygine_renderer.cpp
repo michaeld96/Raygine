@@ -33,7 +33,7 @@ void RaygineRenderer::CreateRenderer()
                                             SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (_raygine_renderer == nullptr)
     {
-        std::cerr << "Error initailizing SDL Renderer!\n";
+        std::cerr << "Error initializing SDL Renderer!\n";
         exit(1); 
     }
 }
