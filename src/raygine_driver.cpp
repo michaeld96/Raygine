@@ -126,8 +126,6 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         {
             ray_x = player_x; 
             ray_y = player_y;
-            // x_offset = cell_size;
-            // y_offset = cell_size;
         }
         else if (degree_to_rad(ray_angle) > PI) // Player is looking down.
         {
@@ -203,8 +201,6 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         {
             ray_x = player_x; 
             ray_y = player_y;
-            // x_offset = cell_size;
-            // y_offset = cell_size;
         }
         else if (degree_to_rad(ray_angle) < (PI/2) || degree_to_rad(ray_angle) > (3*PI / 2)) // Player is looking right.
         {
