@@ -101,8 +101,6 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
 void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle)
 {
     float ray_angle = player_angle - 30;
-    // float ray_angle = player_angle;
-    // ray_angle = MakeInBounds(ray_angle);
     for (int i = 0; i < 60; i++)
     {
         bool hit_wall = false;
