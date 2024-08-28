@@ -34,7 +34,6 @@ std::pair<int, int> ray_to_map_coordinates(float ray_x, float ray_y, int unit_si
     return std::make_pair(int_ray_x, int_ray_y);
 }
 
-
 float MakeInBounds(float _in)
 {
     if (_in > 360)
@@ -102,8 +101,6 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
 void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle)
 {
     float ray_angle = player_angle - 30;
-    // float ray_angle = player_angle;
-    // ray_angle = MakeInBounds(ray_angle);
     for (int i = 0; i < 60; i++)
     {
         bool hit_wall = false;
@@ -111,23 +108,9 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         float horizontal_ray_x = 0.0f, horizontal_ray_y = 0.0f, horizontal_distance = std::numeric_limits<float>::max();
         // Horizontal grid check.
         if (degree_to_rad(ray_angle) == 0 || degree_to_rad(ray_angle) == PI)
-        ray_y = (((int)(player_y / cell_size)) * cell_size) - 0.001; // Round down to nearest cell.
-        ray_x = player_x + (player_y - ray_y) / tan(degree_to_rad(ray_angle));
-        y_offset = -cell_size;
-        x_offset = cell_size * (1 / tan(degree_to_rad(ray_angle)));
-    } 
-    int counter = 0;
-    while (!hit_wall && counter != 10)
-    {
-        std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
-        int int_ray_x = int_ray.first;
-        int int_ray_y = int_ray.second;
-        if ((int_ray_y < map.size() && int_ray_x < map[int_ray_y].size()) && map[int_ray_y][int_ray_x] == 1)
         {
             ray_x = player_x; 
             ray_y = player_y;
-            // x_offset = cell_size;
-            // y_offset = cell_size;
         }
         else if (degree_to_rad(ray_angle) > PI) // Player is looking down.
         {
@@ -145,36 +128,6 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         } 
         int counter = 0;
         while (!hit_wall && counter != 10)
-    }
-    float vertical_ray_x = 0.0f, vertical_ray_y = 0.0f, vertical_distance = std::numeric_limits<float>::max();;
-    // Vertical line check.
-    if (degree_to_rad(ray_angle) == (PI / 2) || degree_to_rad(ray_angle) == (3*PI / 2))
-    {
-        ray_x = player_x; 
-        ray_y = player_y;
-    }
-    else if (degree_to_rad(ray_angle) < (PI/2) || degree_to_rad(ray_angle) > (3*PI / 2)) // Player is looking right.
-    {
-        ray_x = ((int)(player_x / cell_size)) * cell_size + cell_size; // round up tp nearest cell.
-        ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
-        y_offset = -cell_size * tan(degree_to_rad(ray_angle));
-        x_offset = cell_size;
-    }
-    else if (degree_to_rad(ray_angle) > (PI/2) && degree_to_rad(ray_angle) < (3*PI / 2)) // Player is looking left.
-    {
-        ray_x = (((int)(player_x / cell_size)) * cell_size) - 0.001; // Round down to nearest cell.
-        ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
-        y_offset = cell_size * tan(degree_to_rad(ray_angle));
-        x_offset = -cell_size;
-    } 
-    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255);
-    counter = 0;
-    while (counter != 10)
-    {
-        std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
-        int int_ray_x = int_ray.first;
-        int int_ray_y = int_ray.second;
-        if ((int_ray_y < map.size() && int_ray_x < map[int_ray_y].size()) && map[int_ray_y][int_ray_x] == 1)
         {
             std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
             int int_ray_x = int_ray.first;
@@ -203,8 +156,6 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         {
             ray_x = player_x; 
             ray_y = player_y;
-            // x_offset = cell_size;
-            // y_offset = cell_size;
         }
         else if (degree_to_rad(ray_angle) < (PI/2) || degree_to_rad(ray_angle) > (3*PI / 2)) // Player is looking right.
         {
