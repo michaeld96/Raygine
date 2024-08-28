@@ -50,10 +50,10 @@ float MakeInBounds(float _in)
 std::vector<std::vector<int>> map = {
     {1, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 1, 0, 1, 0, 0, 1},
     {1, 0, 0, 0, 1, 0, 0, 1},
-    {1, 0, 0, 0, 1, 0, 1, 1},
-    {1, 0, 1, 0, 1, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 1, 1},
+    {1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 1},
     {1, 1, 1, 1, 1, 1, 1, 1}
 };
@@ -205,12 +205,14 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
             ray_x = vertical_ray_x;
             ray_y = vertical_ray_y;
             shortest_distance = vertical_distance;
+            SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(),250,0,0,255);
         }
         else
         {
             ray_x = horizontal_ray_x;
             ray_y = horizontal_ray_y;
             shortest_distance = horizontal_distance;
+            SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(),150,0,0,255);
         }
 // #ifdef DEBUG
 //         std::cout << "Ray coordinates: (" << ray_x << ", " << ray_y << ")" << std::endl;
@@ -269,7 +271,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         wall_rect.w = slice_width; // Width of the rectangle (slice width)
         wall_rect.h = wall_height; // Height of the rectangle
 
-        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), red, green, blue, 255); // Shaded wall color
+        // SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), red, green, blue, 255); // Shaded wall color
         SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &wall_rect);
 
         ray_angle += 1;
@@ -288,7 +290,7 @@ int main()
     float player_angle = 0.0f;
 
     InitSDL();
-    RaygineRenderer::InitWindow(1200, 1200); 
+    RaygineRenderer::InitWindow(1200, 600); 
     // RaygineRenderer::InitWindow(window_width, window_height); // TODO: FIX ME!!!
     RaygineRenderer::CreateRenderer();
     draw_map();
