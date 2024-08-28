@@ -103,29 +103,34 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
 
 void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle)
 {
-    float ray_angle = player_angle - 30;
-    for (int i = 0; i < 60; i++)
+    const float FOV = 60.0f; // Define your field of view
+    const int num_rays = 240; // Increase the number of rays for smoother render
+    const float ray_increment = FOV / num_rays; // Increment per ray
+    float ray_angle = player_angle - (FOV / 2.0f); // Start angle adjusted for half the FOV
+
+    for (int i = 0; i < num_rays; i++)
     {
         bool hit_wall = false;
         float ray_x = 0.0f, ray_y = 0.0f, x_offset = 0.0f, y_offset = 0.0f;
         float horizontal_ray_x = 0.0f, horizontal_ray_y = 0.0f, horizontal_distance = std::numeric_limits<float>::max();
         float shortest_distance = 0.0f;
-        // Horizontal grid check.
+
+        // Horizontal grid check
         if (degree_to_rad(ray_angle) == 0 || degree_to_rad(ray_angle) == PI)
         {
             ray_x = player_x; 
             ray_y = player_y;
         }
-        else if (degree_to_rad(ray_angle) > PI) // Player is looking down.
+        else if (degree_to_rad(ray_angle) > PI) // Player is looking down
         {
-            ray_y = ((int)(player_y / cell_size)) * cell_size + cell_size; // Round up to nearest cell.
+            ray_y = ((int)(player_y / cell_size)) * cell_size + cell_size; // Round up to nearest cell
             ray_x = player_x + (player_y - ray_y) / tan(degree_to_rad(ray_angle));
             y_offset = cell_size;
             x_offset = -cell_size * (1 / tan(degree_to_rad(ray_angle)));
         }
-        else if (degree_to_rad(ray_angle) < PI) // Player is looking up.
+        else if (degree_to_rad(ray_angle) < PI) // Player is looking up
         {
-            ray_y = (((int)(player_y / cell_size)) * cell_size) - 0.001; // Round down to nearest cell.
+            ray_y = (((int)(player_y / cell_size)) * cell_size) - 0.001; // Round down to nearest cell
             ray_x = player_x + (player_y - ray_y) / tan(degree_to_rad(ray_angle));
             y_offset = -cell_size;
             x_offset = cell_size * (1 / tan(degree_to_rad(ray_angle)));
@@ -139,10 +144,6 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
             if ((int_ray_y < map.size() && int_ray_x < map[int_ray_y].size()) && map[int_ray_y][int_ray_x] == 1)
             {
                 counter = 10;
-#ifdef DEBUG
-                std::cout << "Horizontal: HIT WALL!\n";
-                std::cout << "(" << int_ray_x << ", " << int_ray_y << ")\n";
-#endif
                 horizontal_ray_x = ray_x;
                 horizontal_ray_y = ray_y;
                 horizontal_distance = distance_formula(ray_x, ray_y, player_x, player_y);
@@ -154,23 +155,24 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
                 counter++;
             }
         }
-        float vertical_ray_x = 0.0f, vertical_ray_y = 0.0f, vertical_distance = std::numeric_limits<float>::max();;
-        // Vertical line check.
-        if (degree_to_rad(ray_angle) == (PI / 2) || degree_to_rad(ray_angle) == (3*PI / 2))
+
+        float vertical_ray_x = 0.0f, vertical_ray_y = 0.0f, vertical_distance = std::numeric_limits<float>::max();
+        // Vertical line check
+        if (degree_to_rad(ray_angle) == (PI / 2) || degree_to_rad(ray_angle) == (3 * PI / 2))
         {
             ray_x = player_x; 
             ray_y = player_y;
         }
-        else if (degree_to_rad(ray_angle) < (PI/2) || degree_to_rad(ray_angle) > (3*PI / 2)) // Player is looking right.
+        else if (degree_to_rad(ray_angle) < (PI / 2) || degree_to_rad(ray_angle) > (3 * PI / 2)) // Player is looking right
         {
-            ray_x = ((int)(player_x / cell_size)) * cell_size + cell_size; // round up tp nearest cell.
+            ray_x = ((int)(player_x / cell_size)) * cell_size + cell_size; // Round up to nearest cell
             ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
             y_offset = -cell_size * tan(degree_to_rad(ray_angle));
             x_offset = cell_size;
         }
-        else if (degree_to_rad(ray_angle) > (PI/2) && degree_to_rad(ray_angle) < (3*PI / 2)) // Player is looking left.
+        else if (degree_to_rad(ray_angle) > (PI / 2) && degree_to_rad(ray_angle) < (3 * PI / 2)) // Player is looking left
         {
-            ray_x = (((int)(player_x / cell_size)) * cell_size) - 0.001; // Round down to nearest cell.
+            ray_x = (((int)(player_x / cell_size)) * cell_size) - 0.001; // Round down to nearest cell
             ray_y = player_y + (player_x - ray_x) * tan(degree_to_rad(ray_angle));
             y_offset = cell_size * tan(degree_to_rad(ray_angle));
             x_offset = -cell_size;
@@ -185,10 +187,6 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
             if ((int_ray_y < map.size() && int_ray_x < map[int_ray_y].size()) && map[int_ray_y][int_ray_x] == 1)
             {
                 counter = 10;
-#ifdef DEBUG
-                std::cout << "Vertical: HIT WALL!\n";
-                std::cout << "(" << int_ray_x << ", " << int_ray_y << ")\n";
-# endif
                 vertical_ray_x = ray_x;
                 vertical_ray_y = ray_y;
                 vertical_distance = distance_formula(ray_x, ray_y, player_x, player_y);
@@ -200,60 +198,38 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
                 counter++;
             }
         }
+
         if (vertical_distance < horizontal_distance)
         {
             ray_x = vertical_ray_x;
             ray_y = vertical_ray_y;
             shortest_distance = vertical_distance;
-            SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(),250,0,0,255);
         }
         else
         {
             ray_x = horizontal_ray_x;
             ray_y = horizontal_ray_y;
             shortest_distance = horizontal_distance;
-            SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(),150,0,0,255);
-        }
-// #ifdef DEBUG
-//         std::cout << "Ray coordinates: (" << ray_x << ", " << ray_y << ")" << std::endl;
-// #endif
-        SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
-        // Draw wall.
-        float thirty_degrees = -30.0f;
-
-        // fix fisheye?
-        float correct_fisheye_angle = player_angle - ray_angle;
-        if (correct_fisheye_angle < 0)
-        {
-            correct_fisheye_angle += 360;
-        }
-        else if (correct_fisheye_angle > 360)
-        {
-            correct_fisheye_angle -= 360;
         }
 
-        shortest_distance = shortest_distance * cos(degree_to_rad(correct_fisheye_angle));
+        // Draw 3D projection
+        float correction_angle = player_angle - ray_angle;
+        correction_angle = MakeInBounds(correction_angle);
+        shortest_distance = shortest_distance * cos(degree_to_rad(correction_angle));
 
-        // float projection_plane_distance = (window_width / 2) / tan(degree_to_rad(thirty_degrees)); // Adjust for your FOV.
-        float wall_height = (cell_size * window_width) / shortest_distance;
-        // Clamp wall height to the screen.
-        if (wall_height > window_height) wall_height = window_height;
-
-        // // Calculate x position for the slice.
-        // int x = i * (window_width / 60); // 60 is the number of rays.
-
-        // // Draw the wall slice.
-        // int wall_top = (window_height / 2) - (wall_height / 2);
-        // int wall_bottom = wall_top + wall_height;
-        // SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255); // Wall color.
-        // SDL_RenderDrawLine(RaygineRenderer::GetRenderer(), x + window_width / 2, wall_top, x + window_width / 2, wall_bottom);
-        // Calculate the top and bottom positions for the wall slice
-        int wall_top = (window_height / 2) - (wall_height / 2);
-        int wall_bottom = wall_top + wall_height;
+        float line_height = (cell_size * window_height) / shortest_distance;
+        line_height = std::clamp(line_height, 0.0f, static_cast<float>(window_height)); // Clamp to window height
+        float line_offset = (window_height / 2) - (line_height / 2);
 
         // Calculate x position for the slice
-        int slice_width = window_width / 60; // Number of rays
-        int x = i * slice_width;
+        float screen_x = i * (window_width / static_cast<float>(num_rays)) + window_width / 2;
+
+        // Draw the wall slice as a filled rectangle
+        SDL_Rect wall_rect;
+        wall_rect.x = static_cast<int>(screen_x);
+        wall_rect.y = static_cast<int>(line_offset);
+        wall_rect.w = std::max(1, window_width / num_rays) + 1; // Width of the rectangle (slice width), ensure at least 1 pixel wide
+        wall_rect.h = static_cast<int>(line_height); // Height of the rectangle
 
         // Calculate shading factor based on distance
         float max_distance = 800.0f; // Adjust based on your map and scene size
@@ -264,20 +240,14 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         Uint8 green = static_cast<Uint8>(0 * shading_factor);  // Adjust green if needed
         Uint8 blue = static_cast<Uint8>(0 * shading_factor);   // Adjust blue if needed
 
-        // Draw the wall slice as a filled rectangle
-        SDL_Rect wall_rect;
-        wall_rect.x = x + window_width / 2; // Adjust for the right side of the window
-        wall_rect.y = wall_top;
-        wall_rect.w = slice_width; // Width of the rectangle (slice width)
-        wall_rect.h = wall_height; // Height of the rectangle
-
-        // SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), red, green, blue, 255); // Shaded wall color
+        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), red, green, blue, 255); // Shaded wall color
         SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &wall_rect);
 
-        ray_angle += 1;
-        ray_angle = MakeInBounds(ray_angle);
+        ray_angle += ray_increment; // Move to the next ray angle
+        ray_angle = MakeInBounds(ray_angle); // Keep the angle in bounds [0, 360)
     }
 }
+
 
 
 
