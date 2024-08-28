@@ -5,13 +5,13 @@
 #include "../include/raygine_renderer.hpp"
 #include <utility> // For std::pair.
 #include <limits>
+#include <algorithm> // For std::clamp
 
 #define DEBUG
 
 const int window_width = 800;
-const int window_height = 600;
-// const int cell_size = 20;
-const int cell_size = 60;
+const int window_height = 400;
+const int cell_size = 50;
 const float PI = 3.14159265359;
 
 void InitSDL();
@@ -48,11 +48,14 @@ float MakeInBounds(float _in)
 }
 
 std::vector<std::vector<int>> map = {
-    {1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 1},
-    {1, 0, 1, 0, 1, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1}
+    {1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 1, 0, 1, 0, 0, 1},
+    {1, 0, 0, 0, 1, 0, 0, 1},
+    {1, 0, 0, 0, 1, 0, 1, 1},
+    {1, 0, 1, 0, 1, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1}
 };
 
 float distance_formula(float x1, float y1, float x2, float y2)
@@ -106,6 +109,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         bool hit_wall = false;
         float ray_x = 0.0f, ray_y = 0.0f, x_offset = 0.0f, y_offset = 0.0f;
         float horizontal_ray_x = 0.0f, horizontal_ray_y = 0.0f, horizontal_distance = std::numeric_limits<float>::max();
+        float shortest_distance = 0.0f;
         // Horizontal grid check.
         if (degree_to_rad(ray_angle) == 0 || degree_to_rad(ray_angle) == PI)
         {
@@ -200,18 +204,62 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         {
             ray_x = vertical_ray_x;
             ray_y = vertical_ray_y;
+            shortest_distance = vertical_distance;
         }
         else
         {
             ray_x = horizontal_ray_x;
             ray_y = horizontal_ray_y;
+            shortest_distance = horizontal_distance;
         }
 // #ifdef DEBUG
 //         std::cout << "Ray coordinates: (" << ray_x << ", " << ray_y << ")" << std::endl;
 // #endif
         SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
+        // Draw wall.
+        float thirty_degrees = -30.0f;
+        float projection_plane_distance = (window_width / 2) / tan(degree_to_rad(thirty_degrees)); // Adjust for your FOV.
+        float wall_height = (cell_size * projection_plane_distance) / shortest_distance;
+        // Clamp wall height to the screen.
+        if (wall_height > window_height) wall_height = window_height;
+
+        // // Calculate x position for the slice.
+        // int x = i * (window_width / 60); // 60 is the number of rays.
+
+        // // Draw the wall slice.
+        // int wall_top = (window_height / 2) - (wall_height / 2);
+        // int wall_bottom = wall_top + wall_height;
+        // SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255); // Wall color.
+        // SDL_RenderDrawLine(RaygineRenderer::GetRenderer(), x + window_width / 2, wall_top, x + window_width / 2, wall_bottom);
+        // Calculate the top and bottom positions for the wall slice
+        int wall_top = (window_height / 2) - (wall_height / 2);
+        int wall_bottom = wall_top + wall_height;
+
+        // Calculate x position for the slice
+        int slice_width = window_width / 60; // Number of rays
+        int x = i * slice_width;
+
+        // Calculate shading factor based on distance
+        float max_distance = 800.0f; // Adjust based on your map and scene size
+        float shading_factor = std::clamp(1.0f - (shortest_distance / max_distance), 0.3f, 1.0f); // Clamped to ensure it doesn't get too dark
+
+        // Calculate the shaded color (darker when further away)
+        Uint8 red = static_cast<Uint8>(255 * shading_factor);
+        Uint8 green = static_cast<Uint8>(0 * shading_factor);  // Adjust green if needed
+        Uint8 blue = static_cast<Uint8>(0 * shading_factor);   // Adjust blue if needed
+
+        // Draw the wall slice as a filled rectangle
+        SDL_Rect wall_rect;
+        wall_rect.x = x + window_width / 2; // Adjust for the right side of the window
+        wall_rect.y = wall_top;
+        wall_rect.w = slice_width; // Width of the rectangle (slice width)
+        wall_rect.h = wall_height; // Height of the rectangle
+
+        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), red, green, blue, 255); // Shaded wall color
+        SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &wall_rect);
+
         ray_angle += 1;
-        // ray_angle = MakeInBounds(ray_angle);
+        ray_angle = MakeInBounds(ray_angle);
     }
 }
 
@@ -226,7 +274,7 @@ int main()
     float player_angle = 0.0f;
 
     InitSDL();
-    RaygineRenderer::InitWindow(window_width, window_height);
+    RaygineRenderer::InitWindow(1200, window_height);
     RaygineRenderer::CreateRenderer();
     draw_map();
     // todo, make input manager.
@@ -247,17 +295,17 @@ int main()
                 {
                     case SDLK_w: // Move forward
                     {
-                        player_pos_x += player_delta_x * 1.5;
-                        player_pos_y += player_delta_y * 1.5;
+                        player_pos_x += player_delta_x * 5;
+                        player_pos_y += player_delta_y * 5;
                     }
                     break;
                     case SDLK_s: // Move backward
                     {
-                        player_pos_x -= player_delta_x * 1.5;
-                        player_pos_y -= player_delta_y * 1.5;
+                        player_pos_x -= player_delta_x * 5;
+                        player_pos_y -= player_delta_y * 5;
                     }
                     break;
-                    case SDLK_a: // Rotate left (counter-clockwise)
+                    case SDLK_d: // Rotate left (counter-clockwise)
                     {
                         player_angle += 2; // Adjust rotation speed as needed
                         if (player_angle > 360) 
@@ -268,7 +316,7 @@ int main()
                         player_delta_y = -sin(degree_to_rad(player_angle));
                     }
                     break;
-                    case SDLK_d:  // Rotate right (clockwise)
+                    case SDLK_a:  // Rotate right (clockwise)
                     {
                         player_angle -= 2; // Adjust rotation speed as needed
                         if (player_angle < 0) 
