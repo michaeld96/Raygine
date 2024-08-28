@@ -106,7 +106,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
     const float FOV = 60.0f; // Define your field of view
     const int num_rays = 240; // Increase the number of rays for smoother render
     const float ray_increment = FOV / num_rays; // Increment per ray
-    float ray_angle = player_angle - (FOV / 2.0f); // Start angle adjusted for half the FOV
+    float ray_angle = player_angle + (FOV / 2.0f); // Start angle adjusted for half the FOV
 
     for (int i = 0; i < num_rays; i++)
     {
@@ -247,8 +247,10 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), red, green, blue, 255); // Shaded wall color
         SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &wall_rect);
 
-        ray_angle += ray_increment; // Move to the next ray angle
+        ray_angle -= ray_increment; // Move to the next ray angle
         ray_angle = MakeInBounds(ray_angle); // Keep the angle in bounds [0, 360)
+        // SDL_RenderPresent(RaygineRenderer::GetRenderer());
+        // SDL_Delay(10);
     }
 }
 
@@ -296,7 +298,7 @@ int main()
                         player_pos_y -= player_delta_y * 5;
                     }
                     break;
-                    case SDLK_d: // Rotate left (counter-clockwise)
+                    case SDLK_a: // Rotate left (counter-clockwise)
                     {
                         player_angle += 2; // Adjust rotation speed as needed
                         if (player_angle > 360) 
@@ -307,7 +309,7 @@ int main()
                         player_delta_y = -sin(degree_to_rad(player_angle));
                     }
                     break;
-                    case SDLK_a:  // Rotate right (clockwise)
+                    case SDLK_d:  // Rotate right (clockwise)
                     {
                         player_angle -= 2; // Adjust rotation speed as needed
                         if (player_angle < 0) 
