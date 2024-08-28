@@ -50,7 +50,7 @@ float MakeInBounds(float _in)
 std::vector<std::vector<int>> map = {
     {1, 1, 1, 1, 1, 1, 1},
     {1, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 0, 1, 1, 1},
+    {1, 0, 1, 0, 1, 0, 1},
     {1, 0, 0, 0, 0, 0, 1},
     {1, 1, 1, 1, 1, 1, 1}
 };
@@ -100,10 +100,10 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
 
 void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle)
 {
-    // float ray_angle = player_angle - 30;
-    float ray_angle = player_angle;
+    float ray_angle = player_angle - 30;
+    // float ray_angle = player_angle;
     // ray_angle = MakeInBounds(ray_angle);
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 60; i++)
     {
         bool hit_wall = false;
         float ray_x = 0.0f, ray_y = 0.0f, x_offset = 0.0f, y_offset = 0.0f;
@@ -113,8 +113,8 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         {
             ray_x = player_x; 
             ray_y = player_y;
-            x_offset = cell_size;
-            y_offset = cell_size;
+            // x_offset = cell_size;
+            // y_offset = cell_size;
         }
         else if (degree_to_rad(ray_angle) > PI) // Player is looking down.
         {
@@ -136,7 +136,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
             std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
             int int_ray_x = int_ray.first;
             int int_ray_y = int_ray.second;
-            if ((int_ray_x < map.size() && int_ray_y < map.size()) && map[int_ray_y][int_ray_x] == 1)
+            if ((int_ray_y < map.size() && int_ray_x < map[int_ray_y].size()) && map[int_ray_y][int_ray_x] == 1)
             {
                 counter = 10;
 #ifdef DEBUG
@@ -160,8 +160,8 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         {
             ray_x = player_x; 
             ray_y = player_y;
-            x_offset = cell_size;
-            y_offset = cell_size;
+            // x_offset = cell_size;
+            // y_offset = cell_size;
         }
         else if (degree_to_rad(ray_angle) < (PI/2) || degree_to_rad(ray_angle) > (3*PI / 2)) // Player is looking right.
         {
@@ -184,7 +184,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
             std::pair<int, int> int_ray = ray_to_map_coordinates(ray_x, ray_y, cell_size);
             int int_ray_x = int_ray.first;
             int int_ray_y = int_ray.second;
-            if ((int_ray_x < map.size() && int_ray_y < map.size()) && map[int_ray_y][int_ray_x] == 1)
+            if ((int_ray_y < map.size() && int_ray_x < map[int_ray_y].size()) && map[int_ray_y][int_ray_x] == 1)
             {
                 counter = 10;
 #ifdef DEBUG
@@ -216,7 +216,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
 //         std::cout << "Ray coordinates: (" << ray_x << ", " << ray_y << ")" << std::endl;
 // #endif
         SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, ray_x, ray_y);
-        // ray_angle += 1;
+        ray_angle += 1;
         // ray_angle = MakeInBounds(ray_angle);
     }
 }
