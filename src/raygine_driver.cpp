@@ -103,7 +103,7 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
 
 void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle)
 {
-    const float FOV = 60.0f; // Define your field of view
+    const float FOV = 75.0f; // Define your field of view
     const int num_rays = 240; // Increase the number of rays for smoother render
     const float ray_increment = FOV / num_rays; // Increment per ray
     float ray_angle = player_angle + (FOV / 2.0f); // Start angle adjusted for half the FOV
