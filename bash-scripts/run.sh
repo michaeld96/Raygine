@@ -4,14 +4,10 @@ BUILD_DIR="../build"
 CMAKE_FILES_PATH="../build/CMakeFiles"
 MAKEFILE_PATH="../build/Makefile"
 
-if [ ! -d "$BUILD_DIR" ]; then
-    bash build
-fi
+# run the build script.
 
-if [ ! -d "$CMAKE_FILES_PATH" ]; then
-    cd "$BUILD_DIR"
-    cmake ..
-fi
+sh build.sh
+
 cd "$BUILD_DIR"
 make
 make run
