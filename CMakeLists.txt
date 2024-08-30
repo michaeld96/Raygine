@@ -29,7 +29,8 @@ endif()
 
 # Include directories.
 include_directories(${PROJECT_SOURCE_DIR}/include
-                    ${SDL2_INCLUDE_DIRS})
+                    ${SDL2_INCLUDE_DIRS}
+                    ${PROJECT_SOURCE_DIR}/test)
 
 # Add source files.
 file(GLOB SRC_FILES "${PROJECT_SOURCE_DIR}/src/*.cpp")
@@ -48,9 +49,6 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
     COMMENT "Running ${PROJECT_NAME}..."
 )
-
-# Adding *.hpps.
-include_directories(${PROJECT_SOURCE_DIR}/test)
 
 # Adding testing src files.
 set(TEST_VEC2_SRC_FILE ${PROJECT_SOURCE_DIR}/test/vec2-tests.cpp

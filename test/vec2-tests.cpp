@@ -13,5 +13,6 @@ int main()
 {
     test_rotation();
     ASSERT_EQUAL(1, 1, 0);
+    std::cout << "Ran all tests! :)\n";
     return 0;
 }
