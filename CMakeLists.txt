@@ -32,8 +32,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include
                     ${SDL2_INCLUDE_DIRS})
 
 # Add source files.
-set(SRC_FILES ${PROJECT_SOURCE_DIR}/src/raygine_driver.cpp
-              ${PROJECT_SOURCE_DIR}/src/raygine_renderer.cpp)
+file(GLOB SRC_FILES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 # Add executable
 add_executable(${PROJECT_NAME} ${SRC_FILES})
@@ -48,4 +47,21 @@ add_custom_target(
     DEPENDS ${PROJECT_NAME}
     WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
     COMMENT "Running ${PROJECT_NAME}..."
+)
+
+# Adding *.hpps.
+include_directories(${PROJECT_SOURCE_DIR}/test)
+
+# Adding testing src files.
+set(TEST_VEC2_SRC_FILE ${PROJECT_SOURCE_DIR}/test/vec2-tests.cpp
+                       ${PROJECT_SOURCE_DIR}/src/vec2.cpp)
+
+add_executable(TestVec2 ${TEST_VEC2_SRC_FILE})
+
+add_custom_target(
+    test_vec2
+    COMMAND TestVec2
+    DEPENDS TestVec2
+    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+    COMMENT "Running Vec2 Tests..."
 )
