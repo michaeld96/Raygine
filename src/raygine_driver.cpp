@@ -107,7 +107,7 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
 }
 
-void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle, Player* player)
+void DrawRay(float player_x, float player_y, Vec2<float> ray_dir, Player* player)
 {
     // Find out what tile we are in.
     int map_x = (int)player->pos.x / cell_size;
@@ -119,10 +119,10 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         player->pos.y / cell_size
     };
 
-    Vec2<float> ray_dir = {
-        player->dir.x,
-        player->dir.y
-    };
+    // Vec2<float> ray_dir = {
+    //     player->dir.x,
+    //     player->dir.y
+    // };
 
     // Tells us how much to move along the ray that is cast.
     Vec2<float> ray_unit_step_size = {
@@ -194,6 +194,27 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player->pos.x, player->pos.y, intersection.x, intersection.y);
     }
 }
+
+void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov)
+{
+    float angle_step = fov / float(num_rays - 1);
+
+    for (int i = 0; i < num_rays; i++)
+    {
+        // Calculate the angle for this ray.
+        float ray_angle_offset = -fov / 2.0f + i * angle_step;
+
+        // Calculate the new direction vector for this ray.
+        Vec2<float> ray_dir = {
+            player->dir.x * cos(degree_to_rad(ray_angle_offset)) - player->dir.y * sin(degree_to_rad(ray_angle_offset)),
+            player->dir.x * sin(degree_to_rad(ray_angle_offset)) + player->dir.y * cos(degree_to_rad(ray_angle_offset))
+        };
+
+        // Cast the ray using the calculated direction.
+        DrawRay(player->pos.x, player->pos.y, ray_dir, player);
+    }
+}
+
 
 
 
@@ -278,7 +299,8 @@ int main()
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        DrawRay(player.pos.x, player.pos.y, player.dir.x, player.dir.y, player_angle, &player);
+        // DrawRay(player.pos.x, player.pos.y, player.dir.x, player.dir.y, player_angle, &player);
+        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 60, 60);
         draw_player(player.pos.x, player.pos.y, player.dir.x, player.dir.y);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
