@@ -171,24 +171,25 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         }
         
         // Check if ray has hit a wall
-        if (map[map_x][map_y] > 0)
+        if (map[map_y][map_x] > 0)
         {
             hit = true;
         }
     }
 
     // Calculate exact hit position for rendering
-    float hit_x, hit_y;
+    float perp_wall_dist;
     if (side == 0)
     {
-        hit_x = vertical_x_dist;
-        hit_y = player_y + (vertical_x_dist - player_x) * ray.y / ray.x;
+        perp_wall_dist = (map_x * cell_size - player_x + (1 - step_x) * cell_size / 2) / ray.x;
     }
     else
     {
-        hit_x = player_x + (horizontal_y_dist - player_y) * ray.x / ray.y;
-        hit_y = horizontal_y_dist;
+        perp_wall_dist = (map_y * cell_size - player_y + (1 - step_y) * cell_size / 2) / ray.y;
     }
+
+    float hit_x = player_x + ray.x * perp_wall_dist;
+    float hit_y = player_y + ray.y * perp_wall_dist;
 
     // Render the ray using SDL
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, hit_x, hit_y);
