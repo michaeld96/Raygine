@@ -183,6 +183,8 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         }
     }
 
+    // Draw the intersection point.
+    // We need to convert everything from map space to "pixel" space.
     Vec2<float> intersection = { 0.0f, 0.0f };
     if (wall_hit)
     {
