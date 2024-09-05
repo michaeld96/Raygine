@@ -114,71 +114,86 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         player->dir.y
     };
 
-    // get which map cell we are in.
+    // Get which map cell we are in.
     int map_x = static_cast<int>(player_x) / cell_size;
     int map_y = static_cast<int>(player_y) / cell_size;
 
-    float vertical_x_dist = ray.x;
-    float horizontal_y_dist = ray.y;
+    float vertical_x_dist;
+    float horizontal_y_dist;
 
+    // Calculate the step and initial distance to the first vertical and horizontal grid lines.
     float delta_dist_x = (ray.x == 0) ? 1e30 : std::abs(1 / ray.x);
     float delta_dist_y = (ray.y == 0) ? 1e30 : std::abs(1 / ray.y);
 
-    int step_x = 0;
-    int step_y = 0;
+    int step_x, step_y;
 
-    bool hit = 0;
-    int side = 0;
-
-    // calculate inital step.
-    if (ray.x < 0)
+    // Determine step direction and initial side distance
+    if (ray.x < 0) // Moving left
     {
         step_x = -1;
-        vertical_x_dist = (player->pos.x - map_x) * delta_dist_x;
+        vertical_x_dist = (player_x - map_x * cell_size) * delta_dist_x;
     }
-    else
+    else // Moving right
     {
         step_x = 1;
-        vertical_x_dist = (map_x + 1.0f - player->pos.x) * delta_dist_x;
-    }
-    if (ray.y < 0)
-    {
-        step_y = -1;
-        horizontal_y_dist = (player->pos.y - map_y) * delta_dist_y;
-    }
-    else
-    {
-        step_y = 1;
-        horizontal_y_dist = (map_y + 1.0f - player->pos.y) * delta_dist_y;
+        vertical_x_dist = ((map_x + 1) * cell_size - player_x) * delta_dist_x;
     }
     
+    if (ray.y < 0) // Moving down
+    {
+        step_y = -1;
+        horizontal_y_dist = (player_y - map_y * cell_size) * delta_dist_y;
+    }
+    else // Moving up
+    {
+        step_y = 1;
+        horizontal_y_dist = ((map_y + 1) * cell_size - player_y) * delta_dist_y;
+    }
 
-    //perform DDA
+    bool hit = false;
+    int side = 0;
+
+    // Perform DDA
     while (!hit)
     {
-        //jump to next map square, either in x-direction, or in y-direction
+        // Jump to next map square, either in x-direction or in y-direction
         if (vertical_x_dist < horizontal_y_dist)
         {
             vertical_x_dist += delta_dist_x;
             map_x += step_x;
-            side = 0;
+            side = 0; // Vertical hit
         }
         else
         {
             horizontal_y_dist += delta_dist_y;
             map_y += step_y;
-            side = 1;
+            side = 1; // Horizontal hit
         }
-        //Check if ray has hit a wall
-        if (map[map_x][map_y] > 0) 
+        
+        // Check if ray has hit a wall
+        if (map[map_x][map_y] > 0)
         {
-            hit = 1;
+            hit = true;
         }
     }
 
-    // SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player->pos.x, player->pos.y, vertical_x_dist, horizontal_y_dist);
-    
+    // Calculate exact hit position for rendering
+    float hit_x, hit_y;
+    if (side == 0)
+    {
+        hit_x = vertical_x_dist;
+        hit_y = player_y + (vertical_x_dist - player_x) * ray.y / ray.x;
+    }
+    else
+    {
+        hit_x = player_x + (horizontal_y_dist - player_y) * ray.x / ray.y;
+        hit_y = horizontal_y_dist;
+    }
+
+    // Render the ray using SDL
+    SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, hit_x, hit_y);
 }
+
 
 
 
