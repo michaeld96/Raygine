@@ -107,99 +107,13 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
 }
 
-// void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle, Player* player)
-// {
-//     Vec2<float> ray = {
-//         player->dir.x,
-//         player->dir.y
-//     };
-
-//     // Get which map cell we are in.
-//     int map_x = static_cast<int>(player_x) / cell_size;
-//     int map_y = static_cast<int>(player_y) / cell_size;
-
-//     float vertical_x_dist;
-//     float horizontal_y_dist;
-
-//     // Calculate the step and initial distance to the first vertical and horizontal grid lines.
-//     float delta_dist_x = (ray.x == 0) ? 1e30 : std::abs(1 / ray.x);
-//     float delta_dist_y = (ray.y == 0) ? 1e30 : std::abs(1 / ray.y);
-
-//     int step_x, step_y;
-
-//     // Determine step direction and initial side distance
-//     if (ray.x < 0) // Moving left
-//     {
-//         step_x = -1;
-//         vertical_x_dist = (player_x - map_x * cell_size) * delta_dist_x;
-//     }
-//     else // Moving right
-//     {
-//         step_x = 1;
-//         vertical_x_dist = ((map_x + 1) * cell_size - player_x) * delta_dist_x;
-//     }
-    
-//     if (ray.y < 0) // Moving down
-//     {
-//         step_y = -1;
-//         horizontal_y_dist = (player_y - map_y * cell_size) * delta_dist_y;
-//     }
-//     else // Moving up
-//     {
-//         step_y = 1;
-//         horizontal_y_dist = ((map_y + 1) * cell_size - player_y) * delta_dist_y;
-//     }
-
-//     bool hit = false;
-//     int side = 0;
-
-//     // Perform DDA
-//     while (!hit)
-//     {
-//         // Jump to next map square, either in x-direction or in y-direction
-//         if (vertical_x_dist < horizontal_y_dist)
-//         {
-//             vertical_x_dist += delta_dist_x;
-//             map_x += step_x;
-//             side = 0; // Vertical hit
-//         }
-//         else
-//         {
-//             horizontal_y_dist += delta_dist_y;
-//             map_y += step_y;
-//             side = 1; // Horizontal hit
-//         }
-        
-//         // Check if ray has hit a wall
-//         if (map[map_y][map_x] > 0)
-//         {
-//             hit = true;
-//         }
-//     }
-
-//     // Calculate exact hit position for rendering
-//     float perp_wall_dist;
-//     if (side == 0)
-//     {
-//         perp_wall_dist = (map_x * cell_size - player_x + (1 - step_x) * cell_size / 2) / ray.x;
-//     }
-//     else
-//     {
-//         perp_wall_dist = (map_y * cell_size - player_y + (1 - step_y) * cell_size / 2) / ray.y;
-//     }
-
-//     float hit_x = player_x + ray.x * perp_wall_dist;
-//     float hit_y = player_y + ray.y * perp_wall_dist;
-
-//     // Render the ray using SDL
-//     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, hit_x, hit_y);
-// }
-
 void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle, Player* player)
 {
+    // Find out what tile we are in.
     int map_x = (int)player->pos.x / cell_size;
     int map_y = (int) player->pos.y / cell_size;
 
+    // Convert player position to cell position.
     Vec2<float> ray_start = {
         player->pos.x / cell_size, 
         player->pos.y / cell_size
@@ -210,6 +124,7 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
         player->dir.y
     };
 
+    // Tells us how much to move along the ray that is cast.
     Vec2<float> ray_unit_step_size = {
         sqrt(1 + ((ray_dir.y / ray_dir.x) * (ray_dir.y / ray_dir.x))),
         sqrt(1 + ((ray_dir.x / ray_dir.y) * (ray_dir.x / ray_dir.y)))
@@ -219,27 +134,29 @@ void DrawRay(float player_x, float player_y, float dx, float dy, float player_an
 
     Vec2<int> step = { 0, 0 };
 
+    // Calculate the initial step and step direction.
     if (ray_dir.x < 0)
     {
         step.x = -1;
-        ray_length.x = (ray_start.x - float(map_x)) * ray_unit_step_size.x;
+        ray_length.x = (ray_start.x - static_cast<float>(map_x)) * ray_unit_step_size.x;
     }
     else
     {
         step.x = 1;
-        ray_length.x = (float(map_x + 1) - ray_start.x) * ray_unit_step_size.x;
+        ray_length.x = (static_cast<float>(map_x + 1) - ray_start.x) * ray_unit_step_size.x;
     }
     if (ray_dir.y < 0)
     {
         step.y = -1;
-        ray_length.y = (ray_start.y - float(map_y)) * ray_unit_step_size.y;
+        ray_length.y = (ray_start.y - static_cast<float>(map_y)) * ray_unit_step_size.y;
     }
     else
     {
         step.y = 1;
-        ray_length.y = (float(map_y + 1) - ray_start.y) * ray_unit_step_size.y;
+        ray_length.y = (static_cast<float>(map_y + 1) - ray_start.y) * ray_unit_step_size.y;
     }
 
+    // Perform DDA.
     bool wall_hit = false;
     float distance = 0.0f;
     float max_distance = 100000.0f;
