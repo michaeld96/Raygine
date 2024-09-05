@@ -65,10 +65,9 @@ float distance_formula(float x1, float y1, float x2, float y2)
 }
 
 
-typedef struct Player
-{
-    Vec2 pos;
-    Vec2 dir;
+typedef struct {
+    Vec2<float> pos;
+    Vec2<float> dir;
 } Player;
 
 
@@ -108,10 +107,77 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
 }
 
-void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle)
+void DrawRay(float player_x, float player_y, float dx, float dy, float player_angle, Player* player)
 {
-    // implement dda.
+    Vec2<float> ray = {
+        player->dir.x,
+        player->dir.y
+    };
 
+    // get which map cell we are in.
+    int map_x = static_cast<int>(player_x) / cell_size;
+    int map_y = static_cast<int>(player_y) / cell_size;
+
+    float vertical_x_dist = ray.x;
+    float horizontal_y_dist = ray.y;
+
+    float delta_dist_x = (ray.x == 0) ? 1e30 : std::abs(1 / ray.x);
+    float delta_dist_y = (ray.y == 0) ? 1e30 : std::abs(1 / ray.y);
+
+    int step_x = 0;
+    int step_y = 0;
+
+    bool hit = 0;
+    int side = 0;
+
+    // calculate inital step.
+    if (ray.x < 0)
+    {
+        step_x = -1;
+        vertical_x_dist = (player->pos.x - map_x) * delta_dist_x;
+    }
+    else
+    {
+        step_x = 1;
+        vertical_x_dist = (map_x + 1.0f - player->pos.x) * delta_dist_x;
+    }
+    if (ray.y < 0)
+    {
+        step_y = -1;
+        horizontal_y_dist = (player->pos.y - map_y) * delta_dist_y;
+    }
+    else
+    {
+        step_y = 1;
+        horizontal_y_dist = (map_y + 1.0f - player->pos.y) * delta_dist_y;
+    }
+    
+
+    //perform DDA
+    while (!hit)
+    {
+        //jump to next map square, either in x-direction, or in y-direction
+        if (vertical_x_dist < horizontal_y_dist)
+        {
+            vertical_x_dist += delta_dist_x;
+            map_x += step_x;
+            side = 0;
+        }
+        else
+        {
+            horizontal_y_dist += delta_dist_y;
+            map_y += step_y;
+            side = 1;
+        }
+        //Check if ray has hit a wall
+        if (map[map_x][map_y] > 0) 
+        {
+            hit = 1;
+        }
+    }
+
+    // SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player->pos.x, player->pos.y, vertical_x_dist, horizontal_y_dist);
+    
 }
 
 
@@ -123,10 +189,10 @@ int main()
         { 145.0f, 85.0f },
         { 1.0f, 0.0f }
     };
-    float player_pos_x = 145.0f;
-    float player_pos_y = 85.0f;
-    float player_delta_x = 1.0f;
-    float player_delta_y = 0.0f;
+    // float player_pos_x = 145.0f;
+    // float player_pos_y = 85.0f;
+    // float player_delta_x = 1.0f;
+    // float player_delta_y = 0.0f;
     float player_angle = 0.0f;
 
     InitSDL();
@@ -168,8 +234,8 @@ int main()
                         {
                             player_angle -= 360;
                         }
-                        player_delta_x = cos(degree_to_rad(player_angle));
-                        player_delta_y = -sin(degree_to_rad(player_angle));
+                        player.dir.x = cos(degree_to_rad(player_angle));
+                        player.dir.y= -sin(degree_to_rad(player_angle));
                     }
                     break;
                     case SDLK_d:  // Rotate right (clockwise)
@@ -179,8 +245,8 @@ int main()
                         {
                             player_angle += 360;
                         }
-                        player_delta_x = cos(degree_to_rad(player_angle));
-                        player_delta_y = -sin(degree_to_rad(player_angle));
+                        player.dir.x = cos(degree_to_rad(player_angle));
+                        player.dir.y = -sin(degree_to_rad(player_angle));
                     }
                     break;
                 }
@@ -194,10 +260,10 @@ int main()
         draw_map();
 #ifdef DEBUG
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
-        std::cout << "delta_x: " << player_delta_x << ", delta_y: " << player_delta_y << std::endl;
+        std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        DrawRay(player.pos.x, player.pos.y, player_delta_x, player_delta_y, player_angle);
-        draw_player(player.pos.x, player.pos.y, player_delta_x, player_delta_y);
+        DrawRay(player.pos.x, player.pos.y, player.dir.x, player.dir.y, player_angle, &player);
+        draw_player(player.pos.x, player.pos.y, player.dir.x, player.dir.y);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
     

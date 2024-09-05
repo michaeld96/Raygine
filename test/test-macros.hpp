@@ -9,6 +9,7 @@
         std::cerr << "Test failed for function: " << __func__ <<    \
         "\nFile: " << __FILE__ << "\nLine: " << __LINE__            \
         << "\nCondition " << #condition << " is false.\n";          \
+        return false;                                               \
     }                                                               \
 } while (0)
 
@@ -17,6 +18,7 @@
         std::cerr << "Test failed for function: " << __func__ <<    \
         "\nFile: " << __FILE__ << "\nLine: " << __LINE__ << "\n"    \
         << #cond_1 << " != " << #cond_2 << "\n";                    \
+        return false;                                               \
     }                                                               \
 } while (0)
 
