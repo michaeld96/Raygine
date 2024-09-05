@@ -107,7 +107,7 @@ void draw_player(float player_x, float player_y, float player_dir_x, float playe
     SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
 }
 
-void DrawRay(float player_x, float player_y, Vec2<float> ray_dir, Player* player)
+float DrawRay(float player_x, float player_y, Vec2<float> ray_dir, Player* player)
 {
     // Find out what tile we are in.
     int map_x = (int)player->pos.x / cell_size;
@@ -193,11 +193,13 @@ void DrawRay(float player_x, float player_y, Vec2<float> ray_dir, Player* player
         SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255);
         SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player->pos.x, player->pos.y, intersection.x, intersection.y);
     }
+    return distance;
 }
 
 void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov)
 {
     float angle_step = fov / float(num_rays - 1);
+    float projection_plane_distance = (window_width / 2.0f) / (tan(fov / 2.0f));
 
     for (int i = 0; i < num_rays; i++)
     {
@@ -211,10 +213,24 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         };
 
         // Cast the ray using the calculated direction.
-        DrawRay(player->pos.x, player->pos.y, ray_dir, player);
+        float distance_to_wall = DrawRay(player->pos.x, player->pos.y, ray_dir, player);
+
+        // Correct fisheye.
+        distance_to_wall *= cos(degree_to_rad(ray_angle_offset));
+
+        int wall_height = (int)(projection_plane_distance / distance_to_wall);
+
+        int wall_start = (window_height / 2) - (wall_height / 2);
+        int wall_end = (window_height / 2) + (wall_height / 2);
+
+        // Set color based on hit type
+        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255);
+
+        // Draw filled rectangle for the ray, scaled to half the window width
+        SDL_Rect wall_rect = { (window_width / 2) + i * (window_width / (2 * num_rays)), wall_start, (window_width / (2 * num_rays)), wall_height };
+        SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &wall_rect);
     }
 }
-
 
 
 
@@ -300,7 +316,7 @@ int main()
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
         // DrawRay(player.pos.x, player.pos.y, player.dir.x, player.dir.y, player_angle, &player);
-        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 60, 60);
+        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 60);
         draw_player(player.pos.x, player.pos.y, player.dir.x, player.dir.y);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
