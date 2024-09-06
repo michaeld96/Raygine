@@ -7,6 +7,38 @@ class Vec2
 public:
     T x;
     T y;
+
+    Vec2<T>& operator*(const T& scalar)
+    {
+        x *= scalar;
+        y *= scalar;
+        return *this;
+    }
+    Vec2<T>& operator*(const Vec2<T>& other)
+    {
+        x *= other.x;
+        y *= other.y;
+        return *this;
+    }
+
+    bool operator==(const Vec2<T>& other)
+    {
+        return x == other.x && y == other.y;
+    }
+
+    Vec2<T>& operator*=(const T& scalar)
+    {
+        x *= scalar;
+        y *= scalar;
+        return *this;
+    }
+
+    Vec2<T>& operator*=(const Vec2<T>& other)
+    {
+        x *= other.x;
+        y *= other.y;
+        return *this;
+    }
 };
 
 template <typename T>
@@ -14,8 +46,8 @@ Vec2<T> RotationMatrix2D(Vec2<T> vec, float theta)
 {
     T x = vec.x;
     T y = vec.y;
-    T x_prime = x * cos(theta) - y * sin(theta);
-    T y_prime = x * sin(theta) + y * cos(theta);
+    T x_prime = x * std::cos(theta) - y * std::sin(theta);
+    T y_prime = x * std::sin(theta) + y * std::cos(theta);
     return { x_prime, y_prime };
 }
 #endif  // VEC2_HPP

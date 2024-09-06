@@ -260,15 +260,11 @@ int main()
         { 145.0f, 85.0f },
         { 1.0f, 0.0f }
     };
-    // float player_pos_x = 145.0f;
-    // float player_pos_y = 85.0f;
-    // float player_delta_x = 1.0f;
-    // float player_delta_y = 0.0f;
+
     float player_angle = 0.0f;
 
     InitSDL();
-    // RaygineRenderer::InitWindow(1200, 600); 
-    RaygineRenderer::InitWindow(window_width, window_height); // TODO: FIX ME!!!
+    RaygineRenderer::InitWindow(window_width, window_height);
     RaygineRenderer::CreateRenderer();
     draw_map();
     SDL_Event e;
@@ -300,24 +296,14 @@ int main()
                     break;
                     case SDLK_a: // Rotate left (counter-clockwise)
                     {
-                        player_angle += 2; 
-                        if (player_angle > 360) 
-                        {
-                            player_angle -= 360;
-                        }
-                        player.dir.x = cos(degree_to_rad(player_angle));
-                        player.dir.y= -sin(degree_to_rad(player_angle));
+                        float neg_rotation_constant = -2;
+                        player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(neg_rotation_constant));
                     }
                     break;
                     case SDLK_d:  // Rotate right (clockwise)
                     {
-                        player_angle -= 2; 
-                        if (player_angle < 0) 
-                        {
-                            player_angle += 360;
-                        }
-                        player.dir.x = cos(degree_to_rad(player_angle));
-                        player.dir.y = -sin(degree_to_rad(player_angle));
+                        float rotation_constant = 2;
+                        player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));
                     }
                     break;
                 }

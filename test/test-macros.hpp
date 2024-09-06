@@ -13,8 +13,8 @@
     }                                                               \
 } while (0)
 
-#define ASSERT_EQUAL(cond_1, cond_2, epsilon) do {                  \
-    if (std::fabs((cond_1) - (cond_2)) > (epsilon)) {               \
+#define ASSERT_EQUAL(cond_1, cond_2) do {                  \
+    if (!(cond_1 == cond_2)) {                                      \
         std::cerr << "Test failed for function: " << __func__ <<    \
         "\nFile: " << __FILE__ << "\nLine: " << __LINE__ << "\n"    \
         << #cond_1 << " != " << #cond_2 << "\n";                    \
