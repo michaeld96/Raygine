@@ -245,8 +245,32 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         }
 
         // Draw filled rectangle for the ray, scaled to half the window width
-        SDL_Rect wall_rect = { (window_width / 2) + i * (window_width / (2 * num_rays)), wall_start, (window_width / (2 * num_rays)), wall_height };
+        SDL_Rect wall_rect = { 
+            (window_width / 2) + i * (window_width / (2 * num_rays)), 
+            wall_start, 
+            (window_width / (2 * num_rays)),
+            wall_height };
         SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &wall_rect);
+
+        // Draw ceiling.
+        SDL_Rect ceil_rect = {
+            wall_rect.x, 
+            0,
+            wall_rect.w,
+            wall_start
+        };
+        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 100, 100, 100, 255);
+        SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &ceil_rect);
+
+        // Draw floor.
+        SDL_Rect floor_rect = {
+            wall_rect.x,
+            wall_rect.y + wall_rect.h,
+            wall_rect.w,
+            window_height - (wall_rect.y + wall_rect.h)
+        };
+        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 20, 150, 20, 255);
+        SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &floor_rect);
     }
 }
 
