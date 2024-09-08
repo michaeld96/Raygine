@@ -1,25 +1,25 @@
 #include "../include/vec2.hpp" 
-#include "test-macros.hpp"
+#include "test-utils.hpp"
+#include <unordered_map>
+#include <string>
+#include <vector>
 
 bool test_rotation()
 {
-    std::cout << "Testing 2D Vector Rotation...\n";
     Vec2<float> v1 = { 1.0f, 2.0f };
     v1 = RotationMatrix2D(v1, (3.1415926535 / 2));
     ASSERT_EQUAL(v1.x, (float)-2);
     ASSERT_EQUAL(v1.y, 0.99999994f);
-    std::cout << "All 2D Vector Rotation Tests passed!\n";
     return true;
 }
 
 bool test_mult_operator()
 {
-    std::cout << "Testing 2D Vector * operator...\n";
+    // std::cout << "Testing 2D Vector * operator...\n";
     Vec2<int> v1 = { 1, 3 };
     Vec2<int> v1_check = { 5, 15 };
     v1 = v1 * 5;
     ASSERT_EQUAL(v1, v1_check);
-    std::cout << "All 2D Vector * operator Tests passed!\n";
     
     Vec2<int> v2 = { 2, 6 };
     Vec2<int> v3 = { 3, 10 };
@@ -32,8 +32,17 @@ bool test_mult_operator()
 
 int main()
 {
-    test_rotation();
-    test_mult_operator();
-    std::cout << "Ran all tests! :)\n";
+    std::vector<std::string> func_names = {
+        "test_rotation",
+        "test_mult_operator"  
+    };
+
+    std::vector<std::function<bool()>> func_ptrs = {
+        test_rotation,
+        test_mult_operator
+    };
+    
+    TestUtils::LoadFunctions(func_names, func_ptrs);
+    TestUtils::RunAllFunctions();
     return 0;
 }

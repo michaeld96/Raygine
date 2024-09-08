@@ -21,7 +21,7 @@ public:
         return *this;
     }
 
-    bool const operator==(const Vec2<T>& other)
+    bool operator==(const Vec2<T>& other) const // const after because we are not modifying the object.
     {
         return x == other.x && y == other.y;
     }
