@@ -43,6 +43,6 @@ int main()
     };
     
     TestUtils::LoadFunctions(func_names, func_ptrs);
-    TestUtils::RunAllFunctions();
+    TestUtils::RunAllTests();
     return 0;
 }

@@ -26,6 +26,8 @@
  * Every function that is displayed in the console is in single quotations, so, for 
  * example, the function foo will be represented as `foo` in the console.
  * 
+ * Still toying with the idea if I want this to be an object or not... :|
+ * 
  */
 
 namespace TestUtils
@@ -41,6 +43,15 @@ enum StringOutputColor
 std::unordered_map<std::string, std::function<bool()>> FunctionNameAndPointers;
 
 /* FUNCTIONS */
+
+/**
+ * @brief USED FOR INTERNAL USE!
+ * This function "renders" testing output with a specific color. Each of these colors
+ * is specified with the `StringOutputColor` which can be `RED` or `GREEN`.
+ * @param message A string that you want to be displayed to the console.
+ * @param color Color can be either `StringOutputColor::RED` or `StringOutputColor::GREEN`.
+ * 
+ */
 void TestOutput(const std::string& message, StringOutputColor color)
 {
     const std::string RED_COLOR = "\033[31m";
@@ -97,7 +108,7 @@ void LoadFunctions(const std::vector<std::string> func_names, const std::vector<
  * @param func_name The name of the function you want to run.
  * 
  */
-void RunFunction(std::string func_name)
+void RunTest(std::string func_name)
 {
     if (FunctionNameAndPointers.find(func_name) != FunctionNameAndPointers.end())
     {
@@ -113,12 +124,15 @@ void RunFunction(std::string func_name)
     }
 }
 
-void RunAllFunctions(void)
+/**
+ * @brief This function will run all tests
+ */
+void RunAllTests(void)
 {
     for (auto& pair : FunctionNameAndPointers)
     {
         // Get the function name and run it in RunFunction.
-        RunFunction(pair.first);
+        RunTest(pair.first);
     }
 }
 
