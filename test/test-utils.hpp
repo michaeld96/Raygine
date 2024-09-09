@@ -102,6 +102,31 @@ void LoadFunctions(const std::vector<std::string> func_names, const std::vector<
 }
 
 /**
+ * @brief Specify which function to remove from the testing environment. If this
+ *        function is not found, then an error will be dumped to the console.
+ * @param func_name The name of the function which would be remove.
+ */
+void RemoveFunction(const std::string func_name)
+{
+    if (FunctionNameAndPointers.find(func_name) != FunctionNameAndPointers.end())
+    {
+        FunctionNameAndPointers.erase(func_name);
+    }
+    else
+    {
+        TestOutput("ERROR: Function '" + func_name + "' was not found.", StringOutputColor::RED);
+    }
+}
+
+/**
+ * @brief Will remove all functions from the testing environment.
+ */
+void RemoveAllFunctions()
+{
+    FunctionNameAndPointers.clear();
+}
+
+/**
  * @brief Runs test on the given function name. If the function name is not present
  *        this function will throw an error.
  * 

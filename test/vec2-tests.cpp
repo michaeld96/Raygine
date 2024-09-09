@@ -44,5 +44,6 @@ int main()
     
     TestUtils::LoadFunctions(func_names, func_ptrs);
     TestUtils::RunAllTests();
+    TestUtils::RemoveAllFunctions();
     return 0;
 }
