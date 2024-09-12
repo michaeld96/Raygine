@@ -1,4 +1,6 @@
 #include "../include/raygine_renderer.hpp"
+namespace Raygine
+{
 void RaygineRenderer::InitWindow(int window_width, int window_height)
 {
     int window_x = SDL_WINDOWPOS_CENTERED;
@@ -56,10 +58,40 @@ void RaygineRenderer::DestroyWindow()
 void RaygineRenderer::SetDrawColor(Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
 {
     int result = SDL_SetRenderDrawColor(_raygine_renderer, red, green, blue, alpha);
+    CheckSDLError(result, "SDL_SetRenderDrawColor");
+}
+
+void RaygineRenderer::RenderFillRect(const SDL_Rect* rect)
+{
+    int result = SDL_RenderFillRect(_raygine_renderer, rect);
+    CheckSDLError(result, "SDL_RenderFillRect");
+}
+
+void RaygineRenderer::RenderDrawLineF(float start_x, float start_y, float end_x, float end_y)
+{
+    int result = SDL_RenderDrawLineF(_raygine_renderer, start_x, start_y, end_x, end_y);
+    CheckSDLError(result, "SDL_RenderDrawLineF");
+}
+
+void RaygineRenderer::RenderFillRectF(const SDL_FRect* rect)
+{
+    int result = SDL_RenderFillRectF(_raygine_renderer, rect);
+    CheckSDLError(result, "SDL_RenderDrawRectF");
+}
+
+void RaygineRenderer::RenderDrawRect(const SDL_Rect* rect)
+{
+    int result = SDL_RenderDrawRect(_raygine_renderer, rect);
+    CheckSDLError(result, "SDL_RenderDrawRect");
+}
+void RaygineRenderer::CheckSDLError(int result, const char* sdl_func_name)
+{
     if (result < 0)
     {
-        std::cerr << "SDL_SetRenderDrawColor failed!\n";
+        std::cerr << sdl_func_name << " failed!\n";
+        std::cerr << "SDL's reason: " << SDL_GetError() << "\n";
         exit(1);
     }
 }
 
+}
