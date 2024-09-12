@@ -8,6 +8,13 @@ public:
     T x;
     T y;
 
+    Vec2<T>& operator+(const Vec2<T>& other)
+    {
+        x += other.x;
+        y += other.y;
+        return *this;
+    }
+
     Vec2<T>& operator*(const T& scalar)
     {
         x *= scalar;

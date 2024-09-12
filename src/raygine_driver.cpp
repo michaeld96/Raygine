@@ -106,26 +106,6 @@ void draw_map()
     }
 }
 
-void draw_player(float player_x, float player_y, float player_dir_x, float player_dir_y)
-{
-    SDL_FRect player_r = {
-        player_x, 
-        player_y, 
-        5, 
-        5 
-    };
-    RaygineRenderer::SetDrawColor(255, 0, 0, 255);
-    RaygineRenderer::RenderFillRectF(&player_r);
-
-    float line_length = 20.0f; // Length of the direction line.
-    float end_x = player_x + player_dir_x * line_length;
-    float end_y = player_y + player_dir_y * line_length;
-
-    // Draw the direction line.
-    RaygineRenderer::SetDrawColor(255, 0, 0, 255);
-    RaygineRenderer::RenderDrawLineF(player_x, player_y, end_x, end_y);
-}
-
 HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
 {
     // Find out what tile we are in.
@@ -304,7 +284,7 @@ int main()
     bool quit = false;
     while (!quit)
     {
-        // input
+        // Input
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT)
@@ -342,9 +322,8 @@ int main()
                 }
             }
         }
-        // update
-        // todo.
-        // render
+        // Update.
+        // Render.
         RaygineRenderer::SetDrawColor(0, 0, 0, 255);
         RaygineRenderer::ClearRenderer();
         draw_map();
@@ -352,9 +331,8 @@ int main()
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        // DrawRay(player.pos.x, player.pos.y, player.dir.x, player.dir.y, player_angle, &player);
         DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 65);
-        draw_player(player.pos.x, player.pos.y, player.dir.x, player.dir.y);
+        RaygineRenderer::DrawPlayer(player.pos, player.dir);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
     
