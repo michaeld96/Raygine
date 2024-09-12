@@ -15,6 +15,8 @@ const int window_height = 400;
 const int cell_size = 50;
 const float PI = 3.14159265359;
 
+using namespace Raygine;
+
 void InitSDL();
 float degree_to_rad(float &in_degree)
 {
@@ -93,29 +95,35 @@ void draw_map()
             SDL_Rect r = { x * cell_size, y * cell_size, cell_size, cell_size };
             if (map[y][x] == 1)
             {
+
                 RaygineRenderer::SetDrawColor(255, 255, 255, 255);
                 SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &r);
             }
             // draw border.
             RaygineRenderer::SetDrawColor(120, 120, 120, 255);
-            SDL_RenderDrawRect(RaygineRenderer::GetRenderer(), &r);
+            RaygineRenderer::RenderDrawRect(&r);
         }
     }
 }
 
 void draw_player(float player_x, float player_y, float player_dir_x, float player_dir_y)
 {
-    SDL_FRect player_r = { player_x, player_y, 5, 5 };
+    SDL_FRect player_r = {
+        player_x, 
+        player_y, 
+        5, 
+        5 
+    };
     RaygineRenderer::SetDrawColor(255, 0, 0, 255);
-    SDL_RenderFillRectF(RaygineRenderer::GetRenderer(), &player_r);
+    RaygineRenderer::RenderFillRectF(&player_r);
 
     float line_length = 20.0f; // Length of the direction line.
     float end_x = player_x + player_dir_x * line_length;
     float end_y = player_y + player_dir_y * line_length;
 
     // Draw the direction line.
-    SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255);
-    SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player_x, player_y, end_x, end_y);
+    RaygineRenderer::SetDrawColor(255, 0, 0, 255);
+    RaygineRenderer::RenderDrawLineF(player_x, player_y, end_x, end_y);
 }
 
 HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
@@ -199,8 +207,8 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
     {
         intersection.x = (ray_start.x * cell_size) + (ray_dir.x * cell_size) * distance;
         intersection.y = (ray_start.y * cell_size) + (ray_dir.y * cell_size) * distance;
-        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 0, 255, 0, 255);
-        SDL_RenderDrawLineF(RaygineRenderer::GetRenderer(), player->pos.x, player->pos.y, intersection.x, intersection.y);
+        RaygineRenderer::SetDrawColor(0, 255, 0, 255);
+        RaygineRenderer::RenderDrawLineF(player->pos.x, player->pos.y, intersection.x, intersection.y);
     }
     return { hit_type, distance };
 }
@@ -237,11 +245,11 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         // Set color based on hit type
         if (hit_info.type == HitType::VERTICAL)
         {
-            SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 150, 0, 0, 255);
+            RaygineRenderer::SetDrawColor(150, 0, 0, 255);
         }
         else
         {
-            SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 255, 0, 0, 255);
+            RaygineRenderer::SetDrawColor(255, 0, 0, 255);
         }
 
         // Draw filled rectangle for the ray, scaled to half the window width
@@ -249,8 +257,9 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
             (window_width / 2) + i * (window_width / (2 * num_rays)), 
             wall_start, 
             (window_width / (2 * num_rays)),
-            wall_height };
-        SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &wall_rect);
+            wall_height 
+        };
+        RaygineRenderer::RenderFillRect(&wall_rect);
 
         // Draw ceiling.
         SDL_Rect ceil_rect = {
@@ -259,8 +268,8 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
             wall_rect.w,
             wall_start
         };
-        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 100, 100, 100, 255);
-        SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &ceil_rect);
+        RaygineRenderer::SetDrawColor(100, 100, 100, 255);
+        RaygineRenderer::RenderFillRect(&ceil_rect);
 
         // Draw floor.
         SDL_Rect floor_rect = {
@@ -269,8 +278,8 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
             wall_rect.w,
             window_height - (wall_rect.y + wall_rect.h)
         };
-        SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), 20, 150, 20, 255);
-        SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &floor_rect);
+        RaygineRenderer::SetDrawColor(20, 150, 20, 255);
+        RaygineRenderer::RenderFillRect(&floor_rect);
     }
 }
 
