@@ -94,4 +94,23 @@ void RaygineRenderer::CheckSDLError(int result, const char* sdl_func_name)
     }
 }
 
+void RaygineRenderer::DrawPlayer(Vec2<float> player_pos, Vec2<float> player_dir)
+{
+    SDL_FRect player_r = {
+        player_pos.x, 
+        player_pos.y, 
+        5, 
+        5 
+    };
+    RaygineRenderer::SetDrawColor(255, 0, 0, 255);
+    RaygineRenderer::RenderFillRectF(&player_r);
+
+    float line_length = 20.0f; // Length of the direction line.
+    Vec2<float> end_pos = player_pos + player_dir * line_length;
+
+    // Draw the direction line.
+    RaygineRenderer::SetDrawColor(255, 0, 0, 255);
+    RaygineRenderer::RenderDrawLineF(player_pos.x, player_pos.y, end_pos.x, end_pos.y);
+}
+
 }

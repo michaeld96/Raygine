@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <iostream>
+#include "vec2.hpp"
 
 
 namespace Raygine
@@ -17,6 +18,8 @@ public:
     // Delete copy constructor and assignment operator to prevent copies.
     RaygineRenderer(const RaygineRenderer&) = delete;
     RaygineRenderer& operator=(const RaygineRenderer&) = delete;
+    // Most of these are SDL Functions under the hood, but wanted to keep
+    // them like this so I don't need to call the renderer every function call.
     static void InitWindow(int window_width, int window_height);
     static SDL_Renderer* GetRenderer();
     static void CreateRenderer();
@@ -28,5 +31,7 @@ public:
     static void RenderDrawLineF(float start_x, float start_y, float end_x, float end_y);
     static void RenderFillRectF(const SDL_FRect* rect);
     static void RenderDrawRect(const SDL_Rect* rect);
+    // Custom drawing logic:
+    static void DrawPlayer(Vec2<float> player_pos, Vec2<float> player_dir);
 };
 }
