@@ -7,6 +7,7 @@
 #include <limits>
 #include <algorithm> // For std::clamp
 #include "../include/vec2.hpp"
+#include "map-loader.hpp"
 
 #define DEBUG
 
@@ -269,6 +270,8 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
 
 int main()
 {
+    // TODO: Temp for the moment, will need to remove in the future. Load map.
+    Map map = MapLoader::LoadLevel("level_1");
     Player player = {
         { 145.0f, 85.0f },
         { 1.0f, 0.0f }

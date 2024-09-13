@@ -62,6 +62,10 @@ SDL_Rect r = {
     40
 };
 ```
+*OR* can have the braces on the same line with a space around the braces.
+```cpp
+Vec2<float> v = { 1, 2 };
+```
 
 ### Note
 This is my own coding style and trying to refine it everyday to make my coding more understandable to me. If there 

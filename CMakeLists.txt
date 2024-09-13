@@ -30,7 +30,8 @@ endif()
 # Include directories.
 include_directories(${PROJECT_SOURCE_DIR}/include
                     ${SDL2_INCLUDE_DIRS}
-                    ${PROJECT_SOURCE_DIR}/test)
+                    ${PROJECT_SOURCE_DIR}/test
+                    ${PROJECT_SOURCE_DIR}/libs)
 
 # Add source files.
 file(GLOB SRC_FILES "${PROJECT_SOURCE_DIR}/src/*.cpp")
