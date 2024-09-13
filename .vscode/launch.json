@@ -22,7 +22,7 @@
             "program": "${workspaceFolder}/build/Raygine",
             "args": [], // Command line arguments passed to the program.
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/src", // ?wtf
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb", // or "lldb" if you are using clang

@@ -1,7 +1,11 @@
 #include <vector>
 #include <string>
+#include "../libs/rapidjson/document.h"
 #include "../libs/rapidjson/rapidjson.h"
-
+#include "map.hpp"
+#include "raygine-utils.hpp"
+namespace Raygine
+{
 class MapLoader
 {
 private: 
@@ -11,5 +15,6 @@ public:
     // Delete copy constructor and assignment operator.
     MapLoader(const MapLoader&) = delete;
     MapLoader& operator=(const MapLoader&) = delete;
-    static void LoadLevel(const std::string level_name);
+    static Map LoadLevel(const std::string& level_name);
 };
+}
