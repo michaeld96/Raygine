@@ -84,29 +84,6 @@ typedef struct {
     float distance;
 } HitInfo;
 
-
-
-
-void draw_map()
-{
-    for (int y = 0; y < map.size(); ++y)
-    {
-        for (int x = 0; x < map[y].size(); ++x)
-        {
-            SDL_Rect r = { x * cell_size, y * cell_size, cell_size, cell_size };
-            if (map[y][x] == 1)
-            {
-
-                RaygineRenderer::SetDrawColor(255, 255, 255, 255);
-                SDL_RenderFillRect(RaygineRenderer::GetRenderer(), &r);
-            }
-            // draw border.
-            RaygineRenderer::SetDrawColor(120, 120, 120, 255);
-            RaygineRenderer::RenderDrawRect(&r);
-        }
-    }
-}
-
 HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
 {
     // Find out what tile we are in.
