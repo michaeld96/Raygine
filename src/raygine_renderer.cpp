@@ -125,7 +125,12 @@ void RaygineRenderer::DrawMap(Map& map)
     {
         for (size_t x = 0; x < map_height; ++x)
         {
-            SDL_Rect r = { x * _cell_size, y * _cell_size, _cell_size, _cell_size };
+            SDL_Rect r = { 
+                static_cast<int>(x) * _cell_size, 
+                static_cast<int>(y) * _cell_size, 
+                _cell_size, 
+                _cell_size
+            };
             if (map.GetMapValue(y, x) == 1)
             {
                 // Draw color for the map overhead at the moment is not configurable.
