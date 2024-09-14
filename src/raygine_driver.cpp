@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <utility> // For std::pair.
 #include <vector>
 #include "../include/map_loader.hpp"
