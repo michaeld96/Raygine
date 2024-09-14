@@ -1,6 +1,9 @@
+#ifndef RAYGINE_RENDERER_HPP
+#define RAYGINE_RENDERER_HPP
 #include <SDL2/SDL.h>
 #include <iostream>
 #include "vec2.hpp"
+#include "map.hpp"
 
 
 namespace Raygine
@@ -13,11 +16,13 @@ private:
     static inline const char* _raygine_window_name = "Raygine";
     static inline SDL_Window* _raygine_window = nullptr;
     static inline SDL_Renderer* _raygine_renderer = nullptr;
+    static inline int _cell_size = -1;
     static void CheckSDLError(int result, const char* sdl_func_name);
 public:
     // Delete copy constructor and assignment operator to prevent copies.
     RaygineRenderer(const RaygineRenderer&) = delete;
     RaygineRenderer& operator=(const RaygineRenderer&) = delete;
+    static void SetCellSize(int in_cell_size);
     // Most of these are SDL Functions under the hood, but wanted to keep
     // them like this so I don't need to call the renderer every function call.
     static void InitWindow(int window_width, int window_height);
@@ -33,5 +38,7 @@ public:
     static void RenderDrawRect(const SDL_Rect* rect);
     // Custom drawing logic:
     static void DrawPlayer(Vec2<float> player_pos, Vec2<float> player_dir);
+    static void DrawMap(Map& map);
 };
 }
+#endif // RAYGINE_RENDERER_HPP

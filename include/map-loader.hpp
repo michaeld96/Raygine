@@ -1,3 +1,5 @@
+#ifndef MAP_LOADER_HPP
+#define MAP_LOADER_HPP
 #include <vector>
 #include <string>
 #include "../libs/rapidjson/document.h"
@@ -18,3 +20,4 @@ public:
     static Map LoadLevel(const std::string& level_name);
 };
 }
+#endif // MAP_LOADER_HPP

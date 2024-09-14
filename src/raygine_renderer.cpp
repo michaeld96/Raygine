@@ -1,6 +1,10 @@
 #include "../include/raygine_renderer.hpp"
 namespace Raygine
 {
+void RaygineRenderer::SetCellSize(int in_cell_size)
+{
+    _cell_size = in_cell_size;
+}
 void RaygineRenderer::InitWindow(int window_width, int window_height)
 {
     int window_x = SDL_WINDOWPOS_CENTERED;
@@ -111,6 +115,29 @@ void RaygineRenderer::DrawPlayer(Vec2<float> player_pos, Vec2<float> player_dir)
     // Draw the direction line.
     RaygineRenderer::SetDrawColor(255, 0, 0, 255);
     RaygineRenderer::RenderDrawLineF(player_pos.x, player_pos.y, end_pos.x, end_pos.y);
+}
+
+void RaygineRenderer::DrawMap(Map& map)
+{
+    size_t map_width = map.GetMapWidth();
+    size_t map_height = map.GetMapHeight();
+    for (size_t y = 0; y < map_width; ++y)
+    {
+        for (size_t x = 0; x < map_height; ++x)
+        {
+            SDL_Rect r = { x * _cell_size, y * _cell_size, _cell_size, _cell_size };
+            if (map.GetMapValue(y, x) == 1)
+            {
+                // Draw color for the map overhead at the moment is not configurable.
+                // TODO: do this! ^
+                SetDrawColor(255, 255, 255, 255);
+                RenderFillRect(&r);
+            }
+            // Draw border around all the squares (gives us grid lines).
+            SetDrawColor(120, 120, 120, 255);
+            RenderDrawRect(&r);
+        }
+    }
 }
 
 }
