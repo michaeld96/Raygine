@@ -1,5 +1,5 @@
 #include "../include/vec2.hpp" 
-#include "test-utils.hpp"
+#include "test_utils.hpp"
 #include <unordered_map>
 #include <string>
 #include <vector>

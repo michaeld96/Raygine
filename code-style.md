@@ -66,7 +66,14 @@ SDL_Rect r = {
 ```cpp
 Vec2<float> v = { 1, 2 };
 ```
+## File Naming
+Naming files will be snake case. Header files will be `.hpp`. Example below of naming a file:
+```
+raygine_renderer.cpp
+raygine_renderer.hpp
+```
 
 ### Note
 This is my own coding style and trying to refine it everyday to make my coding more understandable to me. If there 
 is something that seems absurd I am open to comments. :)
+

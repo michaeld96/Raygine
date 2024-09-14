@@ -5,7 +5,7 @@
 #include "../libs/rapidjson/document.h"
 #include "../libs/rapidjson/rapidjson.h"
 #include "map.hpp"
-#include "raygine-utils.hpp"
+#include "raygine_utils.hpp"
 namespace Raygine
 {
 class MapLoader

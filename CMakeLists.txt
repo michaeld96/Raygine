@@ -52,7 +52,7 @@ add_custom_target(
 )
 
 # Adding testing src files.
-set(TEST_VEC2_SRC_FILE ${PROJECT_SOURCE_DIR}/test/vec2-tests.cpp
+set(TEST_VEC2_SRC_FILE ${PROJECT_SOURCE_DIR}/test/vec2_tests.cpp
                        )
 
 add_executable(TestVec2 ${TEST_VEC2_SRC_FILE})

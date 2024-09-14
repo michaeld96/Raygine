@@ -1,13 +1,14 @@
-#include <iostream>
-#include <SDL2/SDL.h>
-#include <vector>
-#include <cmath>
-#include "../include/raygine_renderer.hpp"
-#include <utility> // For std::pair.
-#include <limits>
 #include <algorithm> // For std::clamp
+#include <cmath>
+#include <iostream>
+#include <limits>
+#include <SDL2/SDL.h>
+#include <utility> // For std::pair.
+#include <vector>
+#include "../include/map_loader.hpp"
+#include "../include/raygine_renderer.hpp"
 #include "../include/vec2.hpp"
-#include "map-loader.hpp"
+
 
 #define DEBUG
 
