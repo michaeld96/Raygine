@@ -270,6 +270,8 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
 
 int main()
 {
+    // TODO: Make cell_size configurable...
+    RaygineRenderer::SetCellSize(cell_size);
     // TODO: Temp for the moment, will need to remove in the future. Load map.
     Map map = MapLoader::LoadLevel("level_1");
     Player player = {
@@ -282,7 +284,7 @@ int main()
     InitSDL();
     RaygineRenderer::InitWindow(window_width, window_height);
     RaygineRenderer::CreateRenderer();
-    draw_map();
+    // draw_map();
     SDL_Event e;
     bool quit = false;
     while (!quit)
@@ -329,7 +331,7 @@ int main()
         // Render.
         RaygineRenderer::SetDrawColor(0, 0, 0, 255);
         RaygineRenderer::ClearRenderer();
-        draw_map();
+        RaygineRenderer::DrawMap(map);
 #ifdef DEBUG
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
