@@ -3,7 +3,6 @@ namespace Raygine
 {
 rapidjson::Document RaygineUtils::LoadJsonFile(const std::string& file_path)
 {
-    std::cout << "Current working directory:" << std::filesystem::current_path() << std::endl;
     std::ifstream input_file(file_path);
     if (!input_file.is_open())
     {
