@@ -18,6 +18,9 @@ const int window_height = 400;
 const int cell_size = 50;
 const float PI = 3.14159265359;
 
+// TODO: Remove this:
+SDL_Surface* g_wall_texture = nullptr;
+
 using namespace Raygine;
 
 void InitSDL();
@@ -84,6 +87,7 @@ enum HitType {
 typedef struct {
     HitType type;
     float distance;
+    Vec2<float> intersection;
 } HitInfo;
 
 HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
@@ -159,6 +163,14 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
             }
         }
     }
+     
+    // TODO: WTF, I am guessing this is for textures...
+    Vec2<float> texture_intersection = { 0.0f, 0.0f };
+    if (wall_hit)
+    {
+        texture_intersection.x = player->pos.x + ray_dir.x * distance;
+        texture_intersection.y = player->pos.x + ray_dir.y * distance;  
+    }
 
     // Draw the intersection point.
     // We need to convert everything from map space to "pixel" space.
@@ -170,7 +182,7 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
         RaygineRenderer::SetDrawColor(0, 255, 0, 255);
         RaygineRenderer::RenderDrawLineF(player->pos.x, player->pos.y, intersection.x, intersection.y);
     }
-    return { hit_type, distance };
+    return { hit_type, distance, intersection };
 }
 
 void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov)
@@ -212,6 +224,65 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
             RaygineRenderer::SetDrawColor(255, 0, 0, 255);
         }
 
+                ///////// BEGIN: TEXTURE SHIT /////////
+                    // TODO: Remove this! Just trying to get textures to work...
+    SDL_Surface* g_wall_texture = IMG_Load("../_levels/level_1/map/wall_textures/1.png");
+    if (g_wall_texture == nullptr)
+    {
+        std::cerr << "Failed to get wall texture: SDL's reason" << IMG_GetError() << "\n";
+        exit(1);
+    }
+    // convert surface to know pixel format.
+    SDL_Surface* optimized_wall_texture = SDL_ConvertSurfaceFormat(g_wall_texture, SDL_PIXELFORMAT_ARGB8888, 0);
+    // free og surface
+    SDL_FreeSurface(g_wall_texture);
+    g_wall_texture = optimized_wall_texture;
+        Vec2<float> texture_intersection_point = hit_info.intersection;
+        float wallX; // Exact position where wall was hit
+        if (hit_info.type == HitType::VERTICAL) {
+            // If the wall is vertical, use the X coordinate
+            wallX = texture_intersection_point.y / cell_size - floor(texture_intersection_point.y / cell_size);
+        } else {
+            // If the wall is horizontal, use the Y coordinate    // TODO: Remove this! Just trying to get textures to work...
+    SDL_Surface* g_wall_texture = IMG_Load("../_levels/level_1/map/wall_textures/1.png");
+    if (g_wall_texture == nullptr)
+    {
+        std::cerr << "Failed to get wall texture: SDL's reason" << IMG_GetError() << "\n";
+        exit(1);
+    }
+    // convert surface to know pixel format.
+    SDL_Surface* optimized_wall_texture = SDL_ConvertSurfaceFormat(g_wall_texture, SDL_PIXELFORMAT_ARGB8888, 0);
+    // free og surface
+    SDL_FreeSurface(g_wall_texture);
+    g_wall_texture = optimized_wall_texture;
+            wallX = texture_intersection_point.x / cell_size - floor(texture_intersection_point.x / cell_size);
+        }
+        int texWidth = g_wall_texture->w;
+        int texX = int(wallX * float(texWidth));
+        if (hit_info.type == HitType::VERTICAL) {
+            texX = texWidth - texX - 1; // Adjust for texture orientation if needed
+        }
+        SDL_PixelFormat* format = g_wall_texture->format;
+        Uint32* texture_pixels = (Uint32*)g_wall_texture->pixels;
+        int texHeight = g_wall_texture->h;
+
+        // Draw the textured wall slice
+        int wall_x = (window_width / 2) + i * (window_width / (2 * num_rays));
+        int wall_width = (window_width / (2 * num_rays));
+        for (int y = wall_start; y < wall_end; y++)
+        {
+            int d = y * 256 - window_height * 128 + wall_height * 128;
+            int texY = ((d * texHeight) / wall_height) / 256;
+
+            Uint32 pixel = texture_pixels[texY * texWidth + texX];
+            Uint8 r, g, b, a;
+            SDL_GetRGBA(pixel, format, &r, &g, &b, &a);
+            SDL_SetRenderDrawColor(RaygineRenderer::GetRenderer(), r, g, b, a);
+            SDL_RenderDrawPoint(RaygineRenderer::GetRenderer(), wall_x, y);
+        }
+
+        ///////// END:   TEXTURE_SHIT /////////
+
         // Draw filled rectangle for the ray, scaled to half the window width
         SDL_Rect wall_rect = { 
             (window_width / 2) + i * (window_width / (2 * num_rays)), 
@@ -219,7 +290,7 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
             (window_width / (2 * num_rays)),
             wall_height 
         };
-        RaygineRenderer::RenderFillRect(&wall_rect);
+        // RaygineRenderer::RenderFillRect(&wall_rect);
 
         // Draw ceiling.
         SDL_Rect ceil_rect = {
@@ -249,6 +320,9 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
 
 int main()
 {
+
+
+
     // TODO: Make cell_size configurable...
     RaygineRenderer::SetCellSize(cell_size);
     // TODO: Temp for the moment, will need to remove in the future. Load map.
