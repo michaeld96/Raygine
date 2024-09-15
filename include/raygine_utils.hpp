@@ -1,4 +1,5 @@
-#include <filesystem>
+#ifndef RAYGINE_UTILS_HPP
+#define RAYGINE_UTILS_HPP
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -20,3 +21,4 @@ public:
     static rapidjson::Document LoadJsonFile(const std::string& file_path);
 };
 }
+#endif // RAYGINE_UTILS_HPP
