@@ -23,7 +23,7 @@ std::vector<std::vector<int>> map = {
     {1, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 1, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 2},
     {1, 0, 0, 0, 0, 0, 1, 1},
     {1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 1},
@@ -59,6 +59,7 @@ typedef struct {
     HitType type;
     float distance;
     Vec2<float> intersection;
+    int surface_int;
 } HitInfo;
 
 HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
@@ -110,6 +111,7 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
     float distance = 0.0f;
     float max_distance = 100000.0f;
     HitType hit_type;
+    int surface_texture_type = 0;
     while (!wall_hit && distance < max_distance)
     {
         if (ray_length.x < ray_length.y)
@@ -128,9 +130,14 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
         }
         if (map_x >= 0 && map_x < map[0].size() && map_y >= 0 && map_y < map.size())
         {
-            if (map[map_y][map_x] == 1)
+            if (map[map_y][map_x] > 0)
             {
                 wall_hit = true;
+                surface_texture_type = map[map_y][map_x];
+                if (surface_texture_type == 2)
+                {
+                    printf("aaaa");
+                }
             }
         }
     }
@@ -144,7 +151,7 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
         RaygineRenderer::SetDrawColor(0, 255, 0, 255);
         RaygineRenderer::RenderDrawLineF(player->pos.x, player->pos.y, intersection.x, intersection.y);
     }
-    return { hit_type, distance, intersection };
+    return { hit_type, distance, intersection, surface_texture_type };
 }
 
 // void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov, SDL_Texture* wall_texture, int texWidth, int texHeight)
@@ -227,7 +234,7 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
 //         RaygineRenderer::RenderFillRect(&floor_rect);
 //     }
 // }
-void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov, SDL_Texture* wall_texture, int texWidth, int texHeight)
+void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov, SDL_Texture** wall_texture, int texWidth, int texHeight)
 {
     float angle_step = fov / float(num_rays - 1);
     float projection_plane_distance = (window_width / 2.0f) / tan(fov / 2.0f);
@@ -286,9 +293,9 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         int wall_x = (window_width / 2) + i * (window_width / (2 * num_rays));
         int wall_width = (window_width / (2 * num_rays));
         SDL_Rect dest_rect = { wall_x, wall_start, wall_width, wall_height };
-
+        SDL_Texture* tex = wall_texture[hit_info.surface_int - 1];
         // Render the wall slice
-        SDL_RenderCopy(RaygineRenderer::GetRenderer(), wall_texture, &src_rect, &dest_rect);
+        SDL_RenderCopy(RaygineRenderer::GetRenderer(), tex, &src_rect, &dest_rect);
 
         // Draw ceiling
         SDL_Rect ceil_rect = { dest_rect.x, 0, dest_rect.w, wall_start };
@@ -329,7 +336,6 @@ int main()
     SDL_Surface* optimized_wall_texture_surface = SDL_ConvertSurfaceFormat(g_wall_texture_surface, SDL_PIXELFORMAT_ARGB8888, 0);
     SDL_FreeSurface(g_wall_texture_surface);
     g_wall_texture_surface = optimized_wall_texture_surface;
-
     // Create a texture from the surface
     SDL_Texture* wall_texture = SDL_CreateTextureFromSurface(RaygineRenderer::GetRenderer(), g_wall_texture_surface);
     SDL_FreeSurface(g_wall_texture_surface); // Free the surface as it's no longer needed
@@ -339,6 +345,32 @@ int main()
         std::cerr << "Failed to create texture from surface: " << SDL_GetError() << "\n";
         exit(1);
     }
+
+    ///////////
+        // Load the wall texture once
+    SDL_Surface* g_wall_texture_surface1 = IMG_Load("../_levels/level_1/map/wall_textures/ok.png");
+    if (g_wall_texture_surface == nullptr)
+    {
+        std::cerr << "Failed to load wall texture: " << IMG_GetError() << "\n";
+        exit(1);
+    }
+    // Convert surface to known pixel format
+    SDL_Surface* optimized_wall_texture_surface1 = SDL_ConvertSurfaceFormat(g_wall_texture_surface1, SDL_PIXELFORMAT_ARGB8888, 0);
+    SDL_FreeSurface(g_wall_texture_surface1);
+    g_wall_texture_surface1 = optimized_wall_texture_surface1;
+    // Create a texture from the surface
+    SDL_Texture* wall_texture1 = SDL_CreateTextureFromSurface(RaygineRenderer::GetRenderer(), g_wall_texture_surface1);
+    SDL_FreeSurface(g_wall_texture_surface1); // Free the surface as it's no longer needed
+
+    if (!wall_texture)
+    {
+        std::cerr << "Failed to create texture from surface: " << SDL_GetError() << "\n";
+        exit(1);
+    }
+
+    SDL_Texture* arr[2];
+    arr[0] = wall_texture;
+    arr[1] = wall_texture1;
 
     // Get texture dimensions
     int texWidth, texHeight;
@@ -404,7 +436,7 @@ int main()
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 65, wall_texture, texWidth, texHeight);
+        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 65, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
