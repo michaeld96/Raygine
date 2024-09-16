@@ -30,6 +30,17 @@ std::vector<std::vector<int>> map = {
     {1, 1, 1, 1, 1, 1, 1, 1}
 };
 
+std::vector<std::vector<int>> bottom = {
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 2, 2, 2, 2, 2, 2, 0},
+    {0, 2, 2, 2, 2, 2, 2, 0},
+    {0, 2, 2, 2, 2, 2, 2, 0},
+    {0, 2, 2, 2, 2, 2, 2, 0},
+    {0, 2, 2, 2, 2, 2, 2, 0},
+    {0, 2, 2, 2, 2, 2, 2, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0}
+};
+
 void InitSDL();
 float degree_to_rad(float in_degree)
 {
@@ -134,10 +145,6 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
             {
                 wall_hit = true;
                 surface_texture_type = map[map_y][map_x];
-                if (surface_texture_type == 2)
-                {
-                    printf("aaaa");
-                }
             }
         }
     }
@@ -154,91 +161,11 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
     return { hit_type, distance, intersection, surface_texture_type };
 }
 
-// void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov, SDL_Texture* wall_texture, int texWidth, int texHeight)
-// {
-//     float angle_step = fov / float(num_rays - 1);
-//     float projection_plane_distance = (window_width / 2.0f) / (tan(fov / 2.0f));
-
-//     for (int i = 0; i < num_rays; i++)
-//     {
-//         // Calculate the angle for this ray.
-//         float ray_angle_offset = -fov / 2.0f + i * angle_step;
-
-//         // Calculate the new direction vector for this ray.
-//         Vec2<float> ray_dir = {
-//             player->dir.x * cos(degree_to_rad(ray_angle_offset)) - player->dir.y * sin(degree_to_rad(ray_angle_offset)),
-//             player->dir.x * sin(degree_to_rad(ray_angle_offset)) + player->dir.y * cos(degree_to_rad(ray_angle_offset))
-//         };
-
-//         // Cast the ray using the calculated direction.
-//         HitInfo hit_info = DrawRay(ray_dir, player);
-
-//         // Correct fisheye.
-//         hit_info.distance *= cos(degree_to_rad(ray_angle_offset));
-
-//         int wall_height = (int)(projection_plane_distance / hit_info.distance);
-
-//         int wall_start = (window_height / 2) - (wall_height / 2);
-//         int wall_end = (window_height / 2) + (wall_height / 2);
-
-//         // Calculate wallX
-//         float wallX; // Exact position where wall was hit
-//         if (hit_info.type == HitType::VERTICAL)
-//         {
-//             // If the wall is vertical, use the Y coordinate
-//             wallX = hit_info.intersection.x / cell_size - floor(hit_info.intersection.x / cell_size);
-//         }
-//         else
-//         {
-//             // If the wall is horizontal, use the X coordinate
-//             wallX = hit_info.intersection.y / cell_size - floor(hit_info.intersection.y / cell_size);
-//         }
-
-//         // Calculate texX
-//         int texX = int(wallX * float(texWidth));
-//         if (hit_info.type == HitType::VERTICAL)
-//         {
-//             texX = texWidth - texX - 1;
-//         }
-
-//         // Define the source rectangle from the texture
-//         SDL_Rect src_rect = { texX, 0, 1, texHeight }; // 1 pixel wide slice
-
-//         // Define the destination rectangle on the screen
-//         int wall_x = (window_width / 2) + i * (window_width / (2 * num_rays));
-//         int wall_width = (window_width / (2 * num_rays));
-
-//         SDL_Rect dest_rect = { wall_x, wall_start, wall_width, wall_height };
-
-//         // Render the wall slice
-//         SDL_RenderCopy(RaygineRenderer::GetRenderer(), wall_texture, &src_rect, &dest_rect);
-
-//         // Draw ceiling
-//         SDL_Rect ceil_rect = {
-//             dest_rect.x, 
-//             0,
-//             dest_rect.w,
-//             wall_start
-//         };
-//         RaygineRenderer::SetDrawColor(100, 100, 100, 255);
-//         RaygineRenderer::RenderFillRect(&ceil_rect);
-
-//         // Draw floor
-//         SDL_Rect floor_rect = {
-//             dest_rect.x,
-//             wall_end,
-//             dest_rect.w,
-//             window_height - wall_end
-//         };
-//         RaygineRenderer::SetDrawColor(20, 150, 20, 255);
-//         RaygineRenderer::RenderFillRect(&floor_rect);
-//     }
-// }
-void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov, SDL_Texture** wall_texture, int texWidth, int texHeight)
+void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov, SDL_Texture** wall_texture, SDL_Texture** floor_texture, int texWidth, int texHeight)
 {
     float angle_step = fov / float(num_rays - 1);
     float projection_plane_distance = (window_width / 2.0f) / tan(fov / 2.0f);
-    int ok = 0;
+
     for (int i = 0; i < num_rays; i++)
     {
         float ray_angle_offset = -fov / 2.0f + i * angle_step;
@@ -250,7 +177,7 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         // Cast the ray and get hit information
         HitInfo hit_info = DrawRay(ray_dir, player);
 
-        // Apply fisheye correction
+        // Apply fisheye correction for wall
         hit_info.distance *= cos(degree_to_rad(ray_angle_offset));
 
         // Calculate wall height and vertical position
@@ -258,56 +185,64 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         int wall_start = (window_height / 2) - (wall_height / 2);
         int wall_end = (window_height / 2) + (wall_height / 2);
 
-        // Calculate the position where the wall was hit in world space
-        float wallX = -1;
+        // Calculate texture X coordinate for wall
         int texX;
         if (hit_info.type == HitType::VERTICAL) {
-            // For vertical walls, use the y-coordinate of the hit
-            // wallX = hit_info.intersection.y;
             texX = (int)hit_info.intersection.x % cell_size;
         } else {
-            // For horizontal walls, use the x-coordinate of the hit
-            // wallX = hit_info.intersection.x;
             texX = (int)hit_info.intersection.y % cell_size;
-
         }
 
-        // Convert wallX to a value between 0 and 1 (relative to the cell)
-        // wallX = fmod(wallX, cell_size) / cell_size;
-
-        // int texX = int(wallX * texWidth);
-        // Convert wallX to a texture coordinate
-        // ok = ok >= 50 ? 0 : ok;
-        // int texX = int(wallX * texWidth) + ok;
-        // texX = texX >= 50 ? texX - 50 : texX; 
-        // ok++;
-
-        // Debug output for wallX and texX
-        std::cout << "Ray " << i << " Intersection: (" << hit_info.intersection.x << ", " << hit_info.intersection.y << ")" << std::endl;
-        std::cout << "Ray " << i << " wallX: " << wallX << " texX: " << texX << std::endl;
-
-        // Define the source rectangle from the texture
+        // Define the source rectangle from the wall texture
         SDL_Rect src_rect = { texX, 0, 1, texHeight };
-
-        // Define the destination rectangle on the screen
-        int wall_x = (window_width / 2) + i * (window_width / (2 * num_rays));
-        int wall_width = (window_width / (2 * num_rays));
-        SDL_Rect dest_rect = { wall_x, wall_start, wall_width, wall_height };
+        SDL_Rect dest_rect = { (window_width / 2) + i * (window_width / (2 * num_rays)), wall_start, (window_width / (2 * num_rays)), wall_height };
         SDL_Texture* tex = wall_texture[hit_info.surface_int - 1];
+
         // Render the wall slice
         SDL_RenderCopy(RaygineRenderer::GetRenderer(), tex, &src_rect, &dest_rect);
 
-        // Draw ceiling
-        SDL_Rect ceil_rect = { dest_rect.x, 0, dest_rect.w, wall_start };
-        RaygineRenderer::SetDrawColor(100, 100, 100, 255);
-        RaygineRenderer::RenderFillRect(&ceil_rect);
+        // Draw floor texture line by line
+        for (int y = wall_end; y < window_height; y++)
+        {
+            // Adjust the row distance calculation
+            float row_distance = (projection_plane_distance * cell_size) / ((y - (window_height / 2.0f)) * cos(degree_to_rad(ray_angle_offset)));
 
-        // Draw floor
-        SDL_Rect floor_rect = { dest_rect.x, wall_end, dest_rect.w, window_height - wall_end };
-        RaygineRenderer::SetDrawColor(20, 150, 20, 255);
-        RaygineRenderer::RenderFillRect(&floor_rect);
+            // Calculate the world position for this pixel
+            float floorX = player->pos.x + row_distance * ray_dir.x;
+            float floorY = player->pos.y + row_distance * ray_dir.y;
+
+            // Calculate the texture coordinates
+            int floorTexX = (int)(floorX * texWidth / cell_size) % texWidth;
+            int floorTexY = (int)(floorY * texHeight / cell_size) % texHeight;
+
+            // Select the appropriate floor texture based on the map
+            int floor_cell_x = (int)(floorX / cell_size);
+            int floor_cell_y = (int)(floorY / cell_size);
+
+            // Render the floor pixel if within the map bounds
+            if (floor_cell_x >= 0 && floor_cell_x < map[0].size() && floor_cell_y >= 0 && floor_cell_y < map.size())
+            {
+                int floor_texture_index = bottom[floor_cell_y][floor_cell_x] - 1;
+
+                if (floor_texture_index >= 0)
+                {
+                    SDL_Rect floor_src_rect = { floorTexX, floorTexY, 1, 1 };
+                    SDL_Rect floor_dest_rect = { 
+                        (window_width / 2) + i * (window_width / (2 * num_rays)),
+                        y, 
+                        (window_width / (2 * num_rays)), 
+                        1 
+                    };
+                    SDL_RenderCopy(RaygineRenderer::GetRenderer(), floor_texture[floor_texture_index], &floor_src_rect, &floor_dest_rect);
+                }
+            }
+        }
     }
 }
+
+
+
+
 int main()
 {
     // Initialize SDL and SDL_Image
@@ -436,7 +371,7 @@ int main()
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 65, arr, texWidth, texHeight);
+        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 65, arr, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
