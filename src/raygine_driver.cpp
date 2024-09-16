@@ -138,8 +138,8 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
     Vec2<float> intersection = { 0.0f, 0.0f };
     if (wall_hit)
     {
-        intersection.x = player->pos.x + ray_dir.x * distance;
-        intersection.y = player->pos.y + ray_dir.y * distance;  
+        intersection.x = (ray_start.x * cell_size) + (ray_dir.x * cell_size) * distance;
+        intersection.y = (ray_start.y * cell_size) + (ray_dir.y * cell_size) * distance;
         // Draw the intersection line (optional for debugging)
         RaygineRenderer::SetDrawColor(0, 255, 0, 255);
         RaygineRenderer::RenderDrawLineF(player->pos.x, player->pos.y, intersection.x, intersection.y);
@@ -252,23 +252,28 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         int wall_end = (window_height / 2) + (wall_height / 2);
 
         // Calculate the position where the wall was hit in world space
-        float wallX;
+        float wallX = -1;
+        int texX;
         if (hit_info.type == HitType::VERTICAL) {
             // For vertical walls, use the y-coordinate of the hit
-            wallX = hit_info.intersection.x;
+            // wallX = hit_info.intersection.y;
+            texX = (int)hit_info.intersection.x % cell_size;
         } else {
             // For horizontal walls, use the x-coordinate of the hit
-            wallX = hit_info.intersection.y;
+            // wallX = hit_info.intersection.x;
+            texX = (int)hit_info.intersection.y % cell_size;
+
         }
 
         // Convert wallX to a value between 0 and 1 (relative to the cell)
-        wallX = fmod(wallX, cell_size) / cell_size;
+        // wallX = fmod(wallX, cell_size) / cell_size;
 
+        // int texX = int(wallX * texWidth);
         // Convert wallX to a texture coordinate
-        ok = ok >= 50 ? 0 : ok;
-        int texX = int(wallX * texWidth) + ok;
-        texX = texX >= 50 ? texX - 50 : texX; 
-        ok++;
+        // ok = ok >= 50 ? 0 : ok;
+        // int texX = int(wallX * texWidth) + ok;
+        // texX = texX >= 50 ? texX - 50 : texX; 
+        // ok++;
 
         // Debug output for wallX and texX
         std::cout << "Ray " << i << " Intersection: (" << hit_info.intersection.x << ", " << hit_info.intersection.y << ")" << std::endl;
