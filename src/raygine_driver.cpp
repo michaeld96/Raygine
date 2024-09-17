@@ -19,39 +19,27 @@ const float PI = 3.14159265359;
 
 using namespace Raygine;
 
-std::vector<std::vector<int>> map = {
-    {1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 1, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 2},
-    {1, 0, 0, 0, 0, 0, 1, 1},
-    {1, 0, 1, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1}
-};
+// std::vector<std::vector<int>> map = {
+//     {1, 1, 1, 1, 1, 1, 1, 1},
+//     {1, 0, 0, 0, 0, 0, 0, 1},
+//     {1, 0, 0, 0, 1, 0, 0, 1},
+//     {1, 0, 0, 0, 0, 0, 0, 1},
+//     {1, 0, 0, 0, 0, 0, 1, 1},
+//     {1, 0, 1, 0, 0, 0, 0, 1},
+//     {1, 0, 0, 0, 0, 0, 0, 1},
+//     {1, 1, 1, 1, 1, 1, 1, 1}
+// };
 
-std::vector<std::vector<int>> bottom = {
-    {0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 2, 2, 2, 2, 2, 2, 0},
-    {0, 2, 2, 2, 2, 2, 2, 0},
-    {0, 2, 2, 2, 2, 2, 2, 0},
-    {0, 2, 2, 2, 2, 2, 2, 0},
-    {0, 2, 2, 2, 2, 2, 2, 0},
-    {0, 2, 2, 2, 2, 2, 2, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0}
-};
-
-std::vector<std::vector<int>> top = {
-    {0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0}
-};
-
+// std::vector<std::vector<int>> bottom = {
+//     {0, 0, 0, 0, 0, 0, 0, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 0, 0, 0, 0, 0, 0, 0}
+// };
 
 // std::vector<std::vector<int>> bottom = {
 //     {2, 2, 2, 2, 2, 2, 2, 2},
@@ -63,6 +51,96 @@ std::vector<std::vector<int>> top = {
 //     {2, 2, 2, 2, 2, 2, 2, 2},
 //     {2, 2, 2, 2, 2, 2, 2, 2}
 // };
+
+// std::vector<std::vector<int>> top = {
+//     {0, 0, 0, 0, 0, 0, 0, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 0, 0, 0, 0, 0, 0, 0}
+// };
+
+std::vector<std::vector<int>> map = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+};
+
+// std::vector<std::vector<int>> bottom = {
+//     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+//     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+// };
+
+// Need to have floor extend to the walls. If not, player can see the black
+// -ness of the void. :|
+std::vector<std::vector<int>> bottom = {
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+};
+
+std::vector<std::vector<int>> top = {
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+};
+
 
 void InitSDL();
 float degree_to_rad(float in_degree)
@@ -234,7 +312,8 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         for (int y = 0; y < wall_start; y++)
         {
             // Adjust the row distance calculation for the ceiling
-            float row_distance = (projection_plane_distance * cell_size) / ((window_height / 2.0f - y) * cos(degree_to_rad(ray_angle_offset))) * -.49;
+            // This scaling factor here is adjusting for the players height.
+            float row_distance = (projection_plane_distance * cell_size * -0.5) / ((window_height / 2.0f - y) * cos(degree_to_rad(ray_angle_offset)));
 
             // Calculate the world position for this pixel
             float ceilingX = player->pos.x - row_distance * ray_dir.x;
@@ -275,7 +354,8 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         for (int y = wall_end; y < window_height; y++)
         {
             // Adjust the row distance calculation
-            float row_distance = (projection_plane_distance * cell_size) / ((y - (window_height / 2.0f)) * cos(degree_to_rad(ray_angle_offset))) * 0.48;
+            // Magic .48 is for the player's height.
+            float row_distance = (projection_plane_distance * cell_size * 0.5) / ((y - (window_height / 2.0f)) * cos(degree_to_rad(ray_angle_offset)));
 
             // Calculate the world position for this pixel
             float floorX = player->pos.x + row_distance * ray_dir.x;
@@ -307,20 +387,6 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
                 }
             }
         }
-
-        // for (int y = wall_end; y < window_height; y++)
-        // {
-        //     float straight_distance = (projection_plane_distance * cell_size) / (y - window_height / 2) ;
-        //     float floor_x = player_x + straight_distance * ray_dir.x;
-        //     float floor_y = player_y + straight_distance * ray_dir.y;
-
-        //     int texX = (int)(floor_x * texWidth / cell_size) % texWidth;
-        //     int texY = (int)(floor_y * texHeight / cell_size) % texHeight;
-
-        //     SDL_Rect src_rect = { texX, texY, 1, 1 };
-        //     SDL_Rect dest_rect = { (window_width / 2) + i * (window_width / (2 * num_rays)), y, (window_width / (2 * num_rays)), 1 };
-        //     SDL_RenderCopy(RaygineRenderer::GetRenderer(), floor_texture[1], &src_rect, &dest_rect);
-        // }
     }
 }
 
@@ -345,7 +411,7 @@ int main()
     RaygineRenderer::SetCellSize(cell_size);
 
     // Load the wall texture once
-    SDL_Surface* g_wall_texture_surface = IMG_Load("../_levels/level_1/map/wall_textures/1.png");
+    SDL_Surface* g_wall_texture_surface = IMG_Load("../_levels/level_1/map/wall_textures/wp50.png");
     if (g_wall_texture_surface == nullptr)
     {
         std::cerr << "Failed to load wall texture: " << IMG_GetError() << "\n";
@@ -367,7 +433,7 @@ int main()
 
     ///////////
         // Load the wall texture once
-    SDL_Surface* g_wall_texture_surface1 = IMG_Load("../_levels/level_1/map/wall_textures/ok.png");
+    SDL_Surface* g_wall_texture_surface1 = IMG_Load("../_levels/level_1/map/wall_textures/floor50.png");
     if (g_wall_texture_surface == nullptr)
     {
         std::cerr << "Failed to load wall texture: " << IMG_GetError() << "\n";
@@ -387,7 +453,7 @@ int main()
         exit(1);
     }
     ////////
-        SDL_Surface* g_wall_texture_surface2 = IMG_Load("../_levels/level_1/map/wall_textures/ok.png");
+        SDL_Surface* g_wall_texture_surface2 = IMG_Load("../_levels/level_1/map/wall_textures/ceil.png");
     if (g_wall_texture_surface == nullptr)
     {
         std::cerr << "Failed to load wall texture: " << IMG_GetError() << "\n";
