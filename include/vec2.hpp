@@ -15,6 +15,13 @@ public:
         return *this;
     }
 
+    Vec2<T>& operator-(const Vec2<T>& other)
+    {
+        x -= other.x;
+        y -= other.y;
+        return *this;
+    }
+
     Vec2<T>& operator*(const T& scalar)
     {
         x *= scalar;
@@ -47,6 +54,27 @@ public:
         return *this;
     }
 };
+
+// Define scalar multiplication operator for Vec2
+template <typename T>
+Vec2<T> operator*(const T& scalar, const Vec2<T>& vec)
+{
+    return Vec2<T>{ vec.x * scalar, vec.y * scalar };
+}
+
+template <typename T>
+Vec2<T> operator/(const Vec2<T>& vec, const T& scalar)
+{
+    return Vec2<T>{ vec.x / scalar, vec.y / scalar };
+}
+
+// Define scalar division operator for Vec2 with int
+template <typename T>
+Vec2<T> operator/(const Vec2<T>& vec, const int& scalar)
+{
+    return Vec2<T>{ vec.x / static_cast<T>(scalar), vec.y / static_cast<T>(scalar) };
+}
+
 
 template <typename T>
 Vec2<T> RotationMatrix2D(Vec2<T> vec, float theta)

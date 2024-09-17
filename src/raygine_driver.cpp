@@ -41,6 +41,29 @@ std::vector<std::vector<int>> bottom = {
     {0, 0, 0, 0, 0, 0, 0, 0}
 };
 
+std::vector<std::vector<int>> top = {
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0}
+};
+
+
+// std::vector<std::vector<int>> bottom = {
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2}
+// };
+
 void InitSDL();
 float degree_to_rad(float in_degree)
 {
@@ -161,6 +184,7 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
     return { hit_type, distance, intersection, surface_texture_type };
 }
 
+
 void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov, SDL_Texture** wall_texture, SDL_Texture** floor_texture, int texWidth, int texHeight)
 {
     float angle_step = fov / float(num_rays - 1);
@@ -201,11 +225,52 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
         // Render the wall slice
         SDL_RenderCopy(RaygineRenderer::GetRenderer(), tex, &src_rect, &dest_rect);
 
-        // Draw floor texture line by line
+        // Draw ceiling texture line by line
+for (int y = 0; y < wall_start; y++)
+{
+    // Adjust the row distance calculation for the ceiling
+    float row_distance = (projection_plane_distance * cell_size) / ((window_height / 2.0f - y) * cos(degree_to_rad(ray_angle_offset))) * -.49;
+
+    // Calculate the world position for this pixel
+    float ceilingX = player->pos.x - row_distance * ray_dir.x;
+    float ceilingY = player->pos.y - row_distance * ray_dir.y;
+
+    // Calculate the texture coordinates
+    int ceilingTexX = (int)(ceilingX * texWidth / cell_size) % texWidth;
+    int ceilingTexY = (int)(ceilingY * texHeight / cell_size) % texHeight;
+
+    // Ensure texture coordinates are positive
+    if (ceilingTexX < 0) ceilingTexX += texWidth;
+    if (ceilingTexY < 0) ceilingTexY += texHeight;
+
+    // Select the appropriate ceiling texture based on the map
+    int ceiling_cell_x = (int)(ceilingX / cell_size);
+    int ceiling_cell_y = (int)(ceilingY / cell_size);
+
+    // Render the ceiling pixel if within the map bounds
+    if (ceiling_cell_x >= 0 && ceiling_cell_x < map[0].size() && ceiling_cell_y >= 0 && ceiling_cell_y < map.size())
+    {
+        int ceiling_texture_index = top[ceiling_cell_y][ceiling_cell_x] - 1;
+
+        if (ceiling_texture_index >= 0)
+        {
+            SDL_Rect ceiling_src_rect = { ceilingTexX, ceilingTexY, 1, 1 };
+            SDL_Rect ceiling_dest_rect = { 
+                (window_width / 2) + i * (window_width / (2 * num_rays)),
+                y, 
+                (window_width / (2 * num_rays)), 
+                1 
+            };
+            SDL_RenderCopy(RaygineRenderer::GetRenderer(), floor_texture[ceiling_texture_index], &ceiling_src_rect, &ceiling_dest_rect);
+        }
+    }
+}
+
+        // // Draw floor texture line by line
         for (int y = wall_end; y < window_height; y++)
         {
             // Adjust the row distance calculation
-            float row_distance = (projection_plane_distance * cell_size) / ((y - (window_height / 2.0f)) * cos(degree_to_rad(ray_angle_offset)));
+            float row_distance = (projection_plane_distance * cell_size) / ((y - (window_height / 2.0f)) * cos(degree_to_rad(ray_angle_offset))) * 0.48;
 
             // Calculate the world position for this pixel
             float floorX = player->pos.x + row_distance * ray_dir.x;
@@ -237,6 +302,20 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
                 }
             }
         }
+
+        // for (int y = wall_end; y < window_height; y++)
+        // {
+        //     float straight_distance = (projection_plane_distance * cell_size) / (y - window_height / 2) ;
+        //     float floor_x = player_x + straight_distance * ray_dir.x;
+        //     float floor_y = player_y + straight_distance * ray_dir.y;
+
+        //     int texX = (int)(floor_x * texWidth / cell_size) % texWidth;
+        //     int texY = (int)(floor_y * texHeight / cell_size) % texHeight;
+
+        //     SDL_Rect src_rect = { texX, texY, 1, 1 };
+        //     SDL_Rect dest_rect = { (window_width / 2) + i * (window_width / (2 * num_rays)), y, (window_width / (2 * num_rays)), 1 };
+        //     SDL_RenderCopy(RaygineRenderer::GetRenderer(), floor_texture[1], &src_rect, &dest_rect);
+        // }
     }
 }
 
@@ -302,10 +381,31 @@ int main()
         std::cerr << "Failed to create texture from surface: " << SDL_GetError() << "\n";
         exit(1);
     }
+    ////////
+        SDL_Surface* g_wall_texture_surface2 = IMG_Load("../_levels/level_1/map/wall_textures/ceil.png");
+    if (g_wall_texture_surface == nullptr)
+    {
+        std::cerr << "Failed to load wall texture: " << IMG_GetError() << "\n";
+        exit(1);
+    }
+    // Convert surface to known pixel format
+    SDL_Surface* optimized_wall_texture_surface2 = SDL_ConvertSurfaceFormat(g_wall_texture_surface2, SDL_PIXELFORMAT_ARGB8888, 0);
+    SDL_FreeSurface(g_wall_texture_surface2);
+    g_wall_texture_surface2 = optimized_wall_texture_surface2;
+    // Create a texture from the surface
+    SDL_Texture* wall_texture2 = SDL_CreateTextureFromSurface(RaygineRenderer::GetRenderer(), g_wall_texture_surface2);
+    SDL_FreeSurface(g_wall_texture_surface2); // Free the surface as it's no longer needed
 
-    SDL_Texture* arr[2];
+    if (!wall_texture)
+    {
+        std::cerr << "Failed to create texture from surface: " << SDL_GetError() << "\n";
+        exit(1);
+    }
+
+    SDL_Texture* arr[3];
     arr[0] = wall_texture;
     arr[1] = wall_texture1;
+    arr[2] = wall_texture2;
 
     // Get texture dimensions
     int texWidth, texHeight;
