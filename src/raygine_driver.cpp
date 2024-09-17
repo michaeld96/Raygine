@@ -188,7 +188,12 @@ HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
 void DrawRays(float player_x, float player_y, float player_angle, Player* player, int num_rays, float fov, SDL_Texture** wall_texture, SDL_Texture** floor_texture, int texWidth, int texHeight)
 {
     float angle_step = fov / float(num_rays - 1);
-    float projection_plane_distance = (window_width / 2.0f) / tan(fov / 2.0f);
+    // float projection_plane_distance = (window_width / 2.0f) / tan(degree_to_rad(fov / 2.0f));
+    // This is with some odd scaling factor...
+    // Wondering if I need player height? 
+    float projection_plane_distance = (window_width / 2.0f) / tan(degree_to_rad(fov / 2.0f)) - 400;
+
+    
 
     for (int i = 0; i < num_rays; i++)
     {
@@ -340,7 +345,7 @@ int main()
     RaygineRenderer::SetCellSize(cell_size);
 
     // Load the wall texture once
-    SDL_Surface* g_wall_texture_surface = IMG_Load("../_levels/level_1/map/wall_textures/50.png");
+    SDL_Surface* g_wall_texture_surface = IMG_Load("../_levels/level_1/map/wall_textures/1.png");
     if (g_wall_texture_surface == nullptr)
     {
         std::cerr << "Failed to load wall texture: " << IMG_GetError() << "\n";
@@ -382,7 +387,7 @@ int main()
         exit(1);
     }
     ////////
-        SDL_Surface* g_wall_texture_surface2 = IMG_Load("../_levels/level_1/map/wall_textures/ceil.png");
+        SDL_Surface* g_wall_texture_surface2 = IMG_Load("../_levels/level_1/map/wall_textures/ok.png");
     if (g_wall_texture_surface == nullptr)
     {
         std::cerr << "Failed to load wall texture: " << IMG_GetError() << "\n";
@@ -471,7 +476,7 @@ int main()
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 65, arr, arr, texWidth, texHeight);
+        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 60, arr, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
