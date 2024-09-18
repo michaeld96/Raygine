@@ -174,6 +174,14 @@ typedef struct {
     int surface_int;
 } HitInfo;
 
+typedef struct {
+    float x;
+    float y;
+    size_t id; 
+    int texture_index;
+    float scale;
+} Sprite;
+
 HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
 {
     // Find out what tile we are in.
@@ -392,6 +400,432 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
     }
 }
 
+void draw_enemies_on_overhead(std::vector<Sprite>& e)
+{
+    for (auto& enemy : e)
+    {
+        RaygineRenderer::SetDrawColor(0, 0, 255, 255);
+        SDL_FRect r = {enemy.x, enemy.y, 5, 5};
+        RaygineRenderer::RenderFillRectF(&r);
+    }
+}
+
+// void DrawSprites(Player* player, std::vector<Sprite> sprites, SDL_Texture** sprite_textures, int texWidth, int texHeight, float fov, const int height_adjustment)
+// {
+//     float projection_plane_distance = (window_width / 2.0f) / tan(degree_to_rad(fov / 2.0f)) - height_adjustment;
+//     const float some_scaling_factor = 10.0f; // Adjust this value to scale sprite sizes appropriately
+
+//     for (const auto& sprite : sprites)
+//     {
+//         // Calculate the distance from the player to the sprite
+//         float spriteX = sprite.x - player->pos.x;
+//         float spriteY = sprite.y - player->pos.y;
+//         float distance = sqrt(spriteX * spriteX + spriteY * spriteY);
+
+//         // Calculate the angle between the player's view direction and the direction to the sprite
+//         float sprite_angle = atan2(spriteY, spriteX) - atan2(player->dir.y, player->dir.x);
+
+//         // Normalize the angle to the range [-PI, PI]
+//         if (sprite_angle < -M_PI) sprite_angle += 2 * M_PI;
+//         if (sprite_angle > M_PI) sprite_angle -= 2 * M_PI;
+
+//         // Check if the sprite is within the player's field of view
+//         if (fabs(sprite_angle) < (fov / 2.0f))
+//         {
+//             // Calculate the height of the sprite on the screen
+//             int sprite_height = static_cast<int>((window_height / distance) * some_scaling_factor);
+
+//             // Calculate the vertical position of the sprite on the screen
+//             int sprite_top = (window_height / 2) - (sprite_height / 2);
+//             int sprite_bottom = sprite_top + sprite_height;
+
+//             // Calculate the horizontal position of the sprite on the screen
+//             int sprite_screen_x = (int)((window_width / 2) * (1 + tan(sprite_angle) / tan(degree_to_rad(fov / 2.0f))));
+
+//             // Define the source rectangle from the sprite texture
+//             SDL_Rect src_rect = { 0, 0, texWidth, texHeight };
+//             SDL_Rect dest_rect = { sprite_screen_x - (sprite_height / 2), sprite_top, sprite_height, sprite_height };
+
+//             // Render the sprite
+//             SDL_RenderCopy(RaygineRenderer::GetRenderer(), sprite_textures[sprite.texture_index], &src_rect, &dest_rect);
+//         }
+//     }
+// }
+
+
+// void draw_sprite(Sprite &sprite, SDL_Renderer* renderer, Player &player, SDL_Texture* sprite_texture, int screen_width, int screen_height, float fov) 
+// {
+//     int sprite_texture_height, sprite_texture_width;
+//     SDL_QueryTexture(sprite_texture, nullptr, nullptr, &sprite_texture_width, &sprite_texture_height);
+    
+//     // Calculate the direction from the player to the sprite
+//     float sprite_dir = atan2(sprite.y - player.pos.y, sprite.x - player.pos.x);
+
+//     // Calculate the player's direction angle
+//     float player_dir = atan2(player.dir.y, player.dir.x);
+
+//     // Normalize the direction relative to the player’s view
+//     float relative_dir = sprite_dir - player_dir;
+//     while (relative_dir > M_PI) relative_dir -= 2 * M_PI;
+//     while (relative_dir < -M_PI) relative_dir += 2 * M_PI;
+
+//     // Check if the sprite is within the player's field of view
+//     if (fabs(relative_dir) < degree_to_rad(fov / 2.0f)) 
+//     {
+//         // Calculate the distance from the player to the sprite
+//         float sprite_dist = std::sqrt(std::pow(player.pos.x - sprite.x, 2) + std::pow(player.pos.y - sprite.y, 2));
+
+//         // Calculate the size of the sprite on the screen
+//         // int sprite_screen_size = static_cast<int>(screen_height / sprite_dist); // Adjust this to scale as needed
+//         int sprite_screen_size = 200;
+
+//         // Calculate the horizontal offset where the sprite should be drawn
+//         int h_offset = (relative_dir) * (screen_width / 2) / (fov) + (screen_width / 2) / 2 - sprite_screen_size / 2;
+
+//         // Calculate the vertical offset where the sprite should be drawn
+//         int v_offset = screen_height / 2 - sprite_screen_size / 2;
+
+//         // Define the source rectangle from the sprite texture
+//         SDL_Rect src_rect = {0, 0, sprite_texture_width, sprite_texture_height}; // Assumes the entire texture is used
+
+//         // Define the destination rectangle where the sprite will be drawn on the screen
+//         SDL_Rect dest_rect = {
+//             h_offset + screen_width / 2, // horizontal position
+//             v_offset, // vertical position
+//             sprite_screen_size, // width of the sprite on screen
+//             sprite_screen_size  // height of the sprite on screen
+//         };
+
+//         // Render the sprite
+//         SDL_RenderCopy(renderer, sprite_texture, &src_rect, &dest_rect);
+//     }
+// }
+
+Vec2<float> normalize(const Vec2<float>& v) {
+    float length = sqrt(v.x * v.x + v.y * v.y);
+    if (length != 0) {
+        return { v.x / length, v.y / length };
+    } else {
+        return { 0.0f, 0.0f }; // Handle zero-length vector
+    }
+}
+
+
+// void draw_sprite(Sprite &sprite, SDL_Renderer* renderer, Player &player, SDL_Texture* sprite_texture, int screen_width, int screen_height, float fov) 
+// {
+//     int sprite_texture_width, sprite_texture_height;
+//     SDL_QueryTexture(sprite_texture, nullptr, nullptr, &sprite_texture_width, &sprite_texture_height);
+    
+//     // Ensure the player's direction vector is normalized
+//     player.dir = normalize(player.dir);
+    
+//     // Calculate the direction from the player to the sprite
+//     float dx = sprite.x - player.pos.x;
+//     float dy = sprite.y - player.pos.y;
+//     float sprite_dir = atan2(dy, dx);
+
+//     // Calculate the player's direction angle
+//     float player_dir = atan2(player.dir.y, player.dir.x);
+
+//     // Calculate the relative angle between the sprite and the player's viewing direction
+//     float relative_dir = sprite_dir - player_dir;
+
+//     // Normalize the angle to the range [-π, π]
+//     if (relative_dir > M_PI) relative_dir -= 2 * M_PI;
+//     if (relative_dir < -M_PI) relative_dir += 2 * M_PI;
+
+//     // Convert FOV to radians if it's in degrees
+//     float fov_rad = degree_to_rad(fov); // Ensure this function converts degrees to radians
+
+//     // Check if the sprite is within the player's field of view
+//     if (fabs(relative_dir) < (fov_rad / 2.0f)) 
+//     {
+//         // Calculate the distance from the player to the sprite
+//         float sprite_dist = sqrt(dx * dx + dy * dy);
+
+//         // Perform z-buffering or depth sorting here if necessary
+
+//         // Calculate the size of the sprite on the screen (adjust as needed)
+//         int sprite_screen_size = static_cast<int>((screen_height / sprite_dist) * sprite.scale);
+
+//         // Calculate the horizontal position where the sprite should be drawn
+//         int screen_x_center = screen_width / 2;
+//         float angle_to_pixel = relative_dir / (fov_rad / 2.0f);
+//         int h_offset = static_cast<int>(angle_to_pixel * screen_x_center) - (sprite_screen_size / 2);
+
+//         // Calculate the vertical position where the sprite should be drawn
+//         int v_offset = (screen_height / 2) - (sprite_screen_size / 2);
+
+//         // Define the source rectangle from the sprite texture
+//         SDL_Rect src_rect = {0, 0, sprite_texture_width, sprite_texture_height};
+
+//         // Define the destination rectangle where the sprite will be drawn on the screen
+//         // SDL_Rect dest_rect = {
+//         //     h_offset + screen_x_center + (window_width / 2), // horizontal position
+//         //     v_offset,                   // vertical position
+//         //     sprite_screen_size,         // width of the sprite on screen
+//         //     sprite_screen_size          // height of the sprite on screen
+//         // };
+//         SDL_FRect dest_rect = {
+//             sprite.x + (window_width/2), // Adjust x position to center the sprite
+//             sprite.y + 200, // Adjust y position to move the origin to the bottom
+//             200,
+//             200
+//         };
+//         dest_rect.x -= dest_rect.w / 2;
+//         dest_rect.y -= dest_rect.h;
+
+//         // Render the sprite
+//         // SDL_RenderCopy(renderer, sprite_texture, &src_rect, &dest_rect);
+//         SDL_RenderCopyExF(renderer, sprite_texture, &src_rect, &dest_rect, 0, nullptr, SDL_FLIP_NONE);
+        
+//     }
+// }
+
+// void draw_sprite(Sprite &sprite, SDL_Renderer* renderer, Player &player, SDL_Texture* sprite_texture, int screen_width, int screen_height, float fov)
+// {
+//     int texWidth, texHeight;
+//     SDL_QueryTexture(sprite_texture, nullptr, nullptr, &texWidth, &texHeight);
+
+//     // Calculate the angle between the sprite and the player
+//     float dx = sprite.x - player.pos.x;
+//     float dy = sprite.y - player.pos.y;
+//     float sprite_angle = atan2(dy, dx) - atan2(player.dir.y, player.dir.x);
+
+//     // Normalize the angle to the range [-PI, PI]
+//     if (sprite_angle > M_PI) sprite_angle -= 2 * M_PI;
+//     if (sprite_angle < -M_PI) sprite_angle += 2 * M_PI;
+
+//     // Convert FOV to radians
+//     float fov_rad = degree_to_rad(fov);
+
+//     // Check if the sprite is within the player's FOV
+//     float half_fov = fov_rad / 2.0f;
+//     if (fabs(sprite_angle) > half_fov)
+//         return; // Sprite is not within FOV
+
+//     // Calculate distance to the sprite
+//     float sprite_dist = sqrt(dx * dx + dy * dy);
+
+//     // Correct for fisheye effect
+//     float perp_dist = sprite_dist * cos(sprite_angle);
+
+//     // Calculate sprite height and width on screen
+//     float projection_plane_distance = (screen_width / 2.0f) / tan(half_fov);
+//     int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
+//     int sprite_screen_width = sprite_screen_height; // Assuming square sprites
+
+//     // Calculate sprite's top and bottom Y positions on screen
+//     int sprite_screen_top_y = (screen_height / 2) - (sprite_screen_height / 2);
+//     int sprite_screen_bottom_y = (screen_height / 2) + (sprite_screen_height / 2);
+
+//     // Calculate the horizontal position of the sprite on screen
+//     float sprite_screen_x = (screen_width / 2) + (tan(sprite_angle) * projection_plane_distance) - (sprite_screen_width / 2);
+
+//     // Determine the start and end X positions on screen
+//     int sprite_screen_x_start = (int)sprite_screen_x;
+//     int sprite_screen_x_end = sprite_screen_x_start + sprite_screen_width;
+
+//     // Clip sprite horizontally
+//     if (sprite_screen_x_start < 0) sprite_screen_x_start = 0;
+//     if (sprite_screen_x_end > screen_width) sprite_screen_x_end = screen_width;
+
+//     // Render the sprite column by column
+//     for (int x = sprite_screen_x_start; x < sprite_screen_x_end; x++)
+//     {
+//         // Calculate the corresponding texture X coordinate
+//         int tex_x = (int)((x - sprite_screen_x) * texWidth / sprite_screen_width);
+
+//         // Check depth buffer for occlusion
+//         // if (perp_dist < depth_buffer[x])
+//         {
+//             // Render the sprite column by column
+//             SDL_Rect src_rect = { tex_x, 0, 1, texHeight };
+//             SDL_Rect dest_rect = { x, sprite_screen_top_y, 1, sprite_screen_height };
+//             SDL_RenderCopy(renderer, sprite_texture, &src_rect, &dest_rect);
+//         }
+//     }
+// }
+
+
+// void draw_sprite(Sprite &sprite, SDL_Renderer* renderer, Player &player, SDL_Texture* sprite_texture, int screen_width, int screen_height, float fov)
+// {
+//     int texWidth, texHeight;
+//     SDL_QueryTexture(sprite_texture, nullptr, nullptr, &texWidth, &texHeight);
+//     float sprite_aspect_ratio = (float)texWidth / (float)texHeight;
+
+
+//     // Calculate the angle between the sprite and the player
+//     float dx = sprite.x - player.pos.x;
+//     float dy = sprite.y - player.pos.y;
+//     float sprite_angle = atan2(dy, dx) - atan2(player.dir.y, player.dir.x);
+
+//     // Normalize the angle to the range [-PI, PI]
+//     if (sprite_angle > M_PI) sprite_angle -= 2 * M_PI;
+//     if (sprite_angle < -M_PI) sprite_angle += 2 * M_PI;
+
+//     // Convert FOV to radians
+//     float fov_rad = degree_to_rad(fov);
+
+//     // Check if the sprite is within the player's FOV
+//     float half_fov = fov_rad / 2.0f;
+//     if (fabs(sprite_angle) > half_fov)
+//         return; // Sprite is not within FOV
+
+//     // Calculate distance to the sprite
+//     float sprite_dist = sqrt(dx * dx + dy * dy);
+
+//     // Correct for fisheye effect
+//     float perp_dist = sprite_dist * cos(sprite_angle);
+
+//     // **Adjust for half-screen rendering**
+//     int render_width = screen_width / 2;       // The width of the 3D rendering area
+//     int render_x_offset = screen_width / 2;    // The x offset where rendering starts
+
+//     // Calculate sprite height and width on screen
+//     float projection_plane_distance = (render_width / 2.0f) / tan(half_fov);
+//     int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
+//     int sprite_screen_width = sprite_screen_height; // Assuming square sprites
+
+//     // Calculate sprite's top Y position on screen
+//     int sprite_screen_top_y = (screen_height / 2) - (sprite_screen_height / 2);
+
+//     // Calculate the horizontal position of the sprite on screen
+//     float sprite_screen_x = render_x_offset + (render_width / 2) + (tan(sprite_angle) * projection_plane_distance) - (sprite_screen_width / 2);
+
+//     // Determine the start and end X positions on screen
+//     int sprite_screen_x_start = (int)sprite_screen_x;
+//     int sprite_screen_x_end = sprite_screen_x_start + sprite_screen_width;
+
+//     // Clip sprite horizontally to the rendering area
+//     if (sprite_screen_x_start < render_x_offset) sprite_screen_x_start = render_x_offset;
+//     if (sprite_screen_x_end > screen_width) sprite_screen_x_end = screen_width;
+
+//     // Render the sprite column by column
+//     for (int x = sprite_screen_x_start; x < sprite_screen_x_end; x++)
+//     {
+//         // Calculate the corresponding texture X coordinate
+//         int tex_x = (int)((x - sprite_screen_x) * texWidth / sprite_screen_width);
+
+//         // **Depth Buffer Check (optional, if you have a depth buffer)**
+//         // int buffer_index = x - render_x_offset;
+//         // if (perp_dist < depth_buffer[buffer_index])
+//         {
+//             // Render the sprite column by column
+//             SDL_Rect src_rect = { tex_x, 0, 1, texHeight };
+//             SDL_Rect dest_rect = { x, sprite_screen_top_y, 1, sprite_screen_height };
+//             SDL_RenderCopy(renderer, sprite_texture, &src_rect, &dest_rect);
+//         }
+//     }
+// }
+
+void draw_sprite(Sprite &sprite, SDL_Renderer* renderer, Player &player, SDL_Texture* sprite_texture, int screen_width, int screen_height, float fov)
+{
+    int texWidth, texHeight;
+    SDL_QueryTexture(sprite_texture, nullptr, nullptr, &texWidth, &texHeight);
+
+    // Calculate the angle between the sprite and the player
+    float dx = sprite.x - player.pos.x;
+    float dy = sprite.y - player.pos.y;
+    float sprite_angle = atan2(dy, dx) - atan2(player.dir.y, player.dir.x);
+
+    // Normalize the angle to the range [-PI, PI]
+    if (sprite_angle > M_PI) sprite_angle -= 2 * M_PI;
+    if (sprite_angle < -M_PI) sprite_angle += 2 * M_PI;
+
+    // Convert FOV to radians
+    float fov_rad = degree_to_rad(fov);
+
+    // Check if the sprite is within the player's FOV
+    float half_fov = fov_rad / 2.0f;
+    if (fabs(sprite_angle) > fov_rad)
+        return; // Sprite is not within FOV
+
+    // Calculate distance to the sprite
+    float sprite_dist = sqrt(dx * dx + dy * dy);
+
+    // Correct for fisheye effect
+    float perp_dist = sprite_dist * cos(sprite_angle);
+
+    // Adjust for half-screen rendering
+    int render_width = screen_width / 2;       // The width of the 3D rendering area
+    int render_x_offset = screen_width / 2;    // The x offset where rendering starts
+
+    // Calculate projection plane distance
+    float projection_plane_distance = (render_width / 2.0f) / tan(half_fov);
+
+    // Calculate sprite height on screen
+    int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
+
+    // Calculate sprite width on screen
+    int sprite_screen_width = (int)((cell_size / perp_dist) * projection_plane_distance);
+
+    // Calculate sprite's top Y position on screen
+    int sprite_screen_top_y = (screen_height / 2) - (sprite_screen_height / 2);
+
+    
+
+
+    // Calculate the horizontal position of the sprite on screen
+    float sprite_screen_x = render_x_offset + (render_width / 2) + (tan(sprite_angle) * projection_plane_distance) - (sprite_screen_width / 2);
+
+    // Determine the start and end X positions on screen
+    int sprite_screen_x_start = (int)sprite_screen_x;
+    int sprite_screen_x_end = sprite_screen_x_start + sprite_screen_width;
+
+    // Clip sprite horizontally to the rendering area
+    if (sprite_screen_x_start < render_x_offset) sprite_screen_x_start = render_x_offset;
+    if (sprite_screen_x_end > screen_width) sprite_screen_x_end = screen_width;
+
+    // Render the sprite column by column
+    for (int x = sprite_screen_x_start; x < sprite_screen_x_end; x++)
+    {
+        // Calculate the corresponding texture X coordinate
+        int tex_x = (int)((x - sprite_screen_x) * texWidth / sprite_screen_width);
+
+        // Depth buffer check (optional)
+        // int buffer_index = x - render_x_offset;
+        // if (perp_dist < depth_buffer[buffer_index])
+        {
+            // Render the sprite column by column
+            SDL_Rect src_rect = { tex_x, 0, 1, texHeight };
+            SDL_Rect dest_rect = { x, sprite_screen_top_y, 1, sprite_screen_height };
+            // SDL_RenderDrawRect(renderer, &dest_rect);
+            SDL_RenderCopy(renderer, sprite_texture, &src_rect, &dest_rect);
+            
+        }
+    }
+}
+
+
+
+
+
+
+SDL_Texture* LoadTexture(const char * file_path)
+{
+    // Load the image into an SDL_Surface
+    SDL_Surface* surface = IMG_Load(file_path);
+    if (surface == nullptr)
+    {
+        std::cerr << "Failed to load image: " << IMG_GetError() << "\n";
+        return nullptr;
+    }
+
+    // Convert the SDL_Surface to an SDL_Texture
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(RaygineRenderer::GetRenderer(), surface);
+    if (texture == nullptr)
+    {
+        std::cerr << "Failed to create texture: " << SDL_GetError() << "\n";
+    }
+
+    // Free the SDL_Surface as it is no longer needed
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
+
 
 
 
@@ -480,6 +914,16 @@ int main()
     arr[1] = wall_texture1;
     arr[2] = wall_texture2;
 
+    // SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/Chicken.png");
+    SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/monster.png");
+
+    SDL_Texture* m_arr[1];
+    m_arr[0] = monster_texture;
+    int m_width, m_height;
+    SDL_QueryTexture(monster_texture, nullptr, nullptr, &m_width, &m_height); 
+
+
+
     // Get texture dimensions
     int texWidth, texHeight;
     SDL_QueryTexture(wall_texture, nullptr, nullptr, &texWidth, &texHeight);
@@ -489,6 +933,13 @@ int main()
     Player player = {
         { 145.0f, 85.0f },
         { 1.0f, 0.0f }
+    };
+
+    // init enemies
+    std::vector<Sprite> enemies = {
+        {100.0, 100.0, 0, 0, 5},
+        {200.0, 250.0, 0, 0, 5},
+        {250.0, 50.0, 0, 0, 5}
     };
 
     float player_angle = 0.0f;
@@ -532,6 +983,11 @@ int main()
                         player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));
                     }
                     break;
+                    case SDLK_ESCAPE:
+                    {
+                        quit = true;
+                    }
+                    break;
                 }
             }
         }
@@ -539,13 +995,18 @@ int main()
         // Render.
         RaygineRenderer::SetDrawColor(0, 0, 0, 255);
         RaygineRenderer::ClearRenderer();
-        RaygineRenderer::DrawMap(map);
+        
 #ifdef DEBUG
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
         DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 60, arr, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
+        draw_enemies_on_overhead(enemies);
+        // draw_sprites(enemies, player);
+        // DrawSprites(&player, enemies, m_arr, m_width, m_height, 60, 400);
+        draw_sprite(enemies[0], RaygineRenderer::GetRenderer(), player, m_arr[0], window_width, window_height, 60);
+        RaygineRenderer::DrawMap(map);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
 
