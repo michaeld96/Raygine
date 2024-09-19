@@ -914,7 +914,7 @@ int main()
     arr[1] = wall_texture1;
     arr[2] = wall_texture2;
 
-    // SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/Chicken.png");
+    // SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/light50.png");
     SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/monster.png");
 
     SDL_Texture* m_arr[1];
