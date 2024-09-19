@@ -254,7 +254,7 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
     // This is with some odd scaling factor... This seems to effect the height. Subtracting a large value makes the height lower.
     // Wondering if I need player height? 
     float projection_plane_distance = (window_width / 2.0f) / tan(degree_to_rad(fov / 2.0f)) - height_adjustment;
-
+    int render_x_offset = window_width / 2;
     
 
     for (int i = 0; i < num_rays; i++)
@@ -270,6 +270,22 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
 
         // Apply fisheye correction for wall
         hit_info.distance *= cos(degree_to_rad(ray_angle_offset));
+
+        // After each hit, store this in the depth buffer (using odd technique because the walls 
+        // thickness can vary).
+        int slice_width = window_width / (2 * num_rays);
+        int slice_x_start = render_x_offset + i * slice_width;
+        int slice_x_end = slice_x_start + slice_width;
+
+        for (int x = slice_x_start; x < slice_x_end; x++)
+        {
+            int buffer_index = x - render_x_offset;
+            if (buffer_index >= 0 && buffer_index < (window_width / 2))
+            {
+                depth_buffer[buffer_index] = hit_info.distance * cell_size;
+            }
+        }
+
 
         // Calculate wall height and vertical position
         int wall_height = (int)(projection_plane_distance / hit_info.distance);
@@ -445,17 +461,19 @@ void draw_sprite(Sprite &sprite, SDL_Renderer* renderer, Player &player, SDL_Tex
     {
         // Calculate the corresponding texture X coordinate
         int tex_x = (int)((x - sprite_screen_x) * texWidth / sprite_screen_width);
-
-        // Depth buffer check (optional)
-        // int buffer_index = x - render_x_offset;
-        // if (perp_dist < depth_buffer[buffer_index])
+        // Depth buffer check
+        int buffer_index = x - render_x_offset;
+        if (buffer_index >= 0 && buffer_index < render_width)
         {
-            // Render the sprite column by column
-            SDL_Rect src_rect = { tex_x, 0, 1, texHeight };
-            SDL_Rect dest_rect = { x, sprite_screen_top_y, 1, sprite_screen_height };
-            // SDL_RenderDrawRect(renderer, &dest_rect);
-            SDL_RenderCopy(renderer, sprite_texture, &src_rect, &dest_rect);
+            if (perp_dist < depth_buffer[buffer_index])
+            {
             
+                // Render the sprite column by column
+                SDL_Rect src_rect = { tex_x, 0, 1, texHeight };
+                SDL_Rect dest_rect = { x, sprite_screen_top_y, 1, sprite_screen_height };
+                // SDL_RenderDrawRect(renderer, &dest_rect);
+                SDL_RenderCopy(renderer, sprite_texture, &src_rect, &dest_rect);
+            }
         }
     }
 }
@@ -665,7 +683,7 @@ int main()
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 400, 60, arr, arr, texWidth, texHeight);
+        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 100, 60, arr, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
         draw_enemies_on_overhead(enemies);
         draw_sprite(enemies[0], RaygineRenderer::GetRenderer(), player, m_arr[0], window_width, window_height, 60);
