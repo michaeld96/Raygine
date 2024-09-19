@@ -755,6 +755,7 @@ void draw_sprite(Sprite &sprite, SDL_Renderer* renderer, Player &player, SDL_Tex
     float projection_plane_distance = (render_width / 2.0f) / tan(half_fov);
 
     // Calculate sprite height on screen
+    // TODO: NEED TO SCALE APPROPRIATELY... IF BIGGER SCREEN, BIGGER CELL SIZE.
     int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
 
     // Calculate sprite width on screen
@@ -915,7 +916,9 @@ int main()
     arr[2] = wall_texture2;
 
     // SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/light50.png");
-    SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/monster.png");
+    // SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/monster.png");
+    SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/table64.png");
+
 
     SDL_Texture* m_arr[1];
     m_arr[0] = monster_texture;
