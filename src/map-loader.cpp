@@ -5,7 +5,6 @@ namespace Raygine
 Map MapLoader::LoadLevel(const std::string& level_name)
 {
     // Appending to file path to read from correct level.
-
     std::string file_path = _level_file_path + level_name + "/map/map.json";
     // Read in the JSON object that the map is represented in.
     rapidjson::Document document = RaygineUtils::LoadJsonFile(file_path);
