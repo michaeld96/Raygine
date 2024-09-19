@@ -150,7 +150,9 @@ typedef struct {
     float y;
     size_t id; 
     int texture_index;
-    float scale;
+    int texture_width;
+    int texture_height;
+    float dist_from_player;
 } Sprite;
 
 HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
@@ -400,79 +402,101 @@ void draw_enemies_on_overhead(std::vector<Sprite>& e)
     }
 }
 
-void draw_sprite(Sprite &sprite, SDL_Renderer* renderer, Player &player, SDL_Texture* sprite_texture, int screen_width, int screen_height, float fov)
+void draw_sprite(std::vector<Sprite> sprites, SDL_Renderer* renderer, Player &player, SDL_Texture** sprite_texture, int screen_width, int screen_height, float fov)
 {
-    int texWidth, texHeight;
-    SDL_QueryTexture(sprite_texture, nullptr, nullptr, &texWidth, &texHeight);
-
-    // Calculate the angle between the sprite and the player
-    float dx = sprite.x - player.pos.x;
-    float dy = sprite.y - player.pos.y;
-    float sprite_angle = atan2(dy, dx) - atan2(player.dir.y, player.dir.x);
-
-    // Normalize the angle to the range [-PI, PI]
-    if (sprite_angle > M_PI) sprite_angle -= 2 * M_PI;
-    if (sprite_angle < -M_PI) sprite_angle += 2 * M_PI;
-
-    // Convert FOV to radians
-    float fov_rad = degree_to_rad(fov);
-
-    // Check if the sprite is within the player's FOV
-    float half_fov = fov_rad / 2.0f;
-    if (fabs(sprite_angle) > fov_rad)
-        return; // Sprite is not within FOV
-
-    // Calculate distance to the sprite
-    float sprite_dist = sqrt(dx * dx + dy * dy);
-
-    // Correct for fisheye effect
-    float perp_dist = sprite_dist * cos(sprite_angle);
-
-    // Adjust for half-screen rendering
-    int render_width = screen_width / 2;       // The width of the 3D rendering area
-    int render_x_offset = screen_width / 2;    // The x offset where rendering starts
-
-    // Calculate projection plane distance
-    float projection_plane_distance = (render_width / 2.0f) / tan(half_fov);
-
-    // Calculate sprite height on screen
-    // TODO: NEED TO SCALE APPROPRIATELY... IF BIGGER SCREEN, BIGGER CELL SIZE. (something to think about.)
-    int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
-
-    // Calculate sprite width on screen
-    int sprite_screen_width = (int)((cell_size / perp_dist) * projection_plane_distance);
-
-    // Calculate sprite's top Y position on screen
-    int sprite_screen_top_y = (screen_height / 2) - (sprite_screen_height / 2);
-
-    // Calculate the horizontal position of the sprite on screen
-    float sprite_screen_x = render_x_offset + (render_width / 2) + (tan(sprite_angle) * projection_plane_distance) - (sprite_screen_width / 2);
-
-    // Determine the start and end X positions on screen
-    int sprite_screen_x_start = (int)sprite_screen_x;
-    int sprite_screen_x_end = sprite_screen_x_start + sprite_screen_width;
-
-    // Clip sprite horizontally to the rendering area
-    if (sprite_screen_x_start < render_x_offset) sprite_screen_x_start = render_x_offset;
-    if (sprite_screen_x_end > screen_width) sprite_screen_x_end = screen_width;
-
-    // Render the sprite column by column
-    for (int x = sprite_screen_x_start; x < sprite_screen_x_end; x++)
+    std::vector<Sprite> visible_sprites;
+    // int texWidth, texHeight;
+    for (auto& sprite : sprites) 
     {
-        // Calculate the corresponding texture X coordinate
-        int tex_x = (int)((x - sprite_screen_x) * texWidth / sprite_screen_width);
-        // Depth buffer check
-        int buffer_index = x - render_x_offset;
-        if (buffer_index >= 0 && buffer_index < render_width)
+        SDL_QueryTexture(sprite_texture[sprite.texture_index], nullptr, nullptr, &sprite.texture_width, &sprite.texture_height);
+        // Calculate the angle between the sprite and the player
+        float dx = sprite.x - player.pos.x;
+        float dy = sprite.y - player.pos.y;
+        float sprite_angle = atan2(dy, dx) - atan2(player.dir.y, player.dir.x);
+
+        // Normalize the angle to the range [-PI, PI]
+        if (sprite_angle > M_PI) sprite_angle -= 2 * M_PI;
+        if (sprite_angle < -M_PI) sprite_angle += 2 * M_PI;
+
+        // Convert FOV to radians
+        float fov_rad = degree_to_rad(fov);
+
+        // Check if the sprite is within the player's FOV
+        float half_fov = fov_rad / 2.0f;
+        if (fabs(sprite_angle) < fov_rad)
         {
-            if (perp_dist < depth_buffer[buffer_index])
+            sprite.dist_from_player = sqrt(dx * dx + dy * dy);
+            visible_sprites.push_back(sprite);
+        }
+            // return; // Sprite is not within FOV
+    }
+
+    // Sort the visible_sprites vector by distance from the player
+    std::sort(visible_sprites.begin(), visible_sprites.end(), [](const Sprite& a, const Sprite& b) {
+        return a.dist_from_player > b.dist_from_player; // Sort in descending order
+    });
+
+    for (auto& sprite : visible_sprites)
+    {
+        float dx = sprite.x - player.pos.x;
+        float dy = sprite.y - player.pos.y;
+        float sprite_angle = atan2(dy, dx) - atan2(player.dir.y, player.dir.x);
+        // Calculate distance to the sprite
+        float sprite_dist = sqrt(dx * dx + dy * dy);
+        // Convert FOV to radians
+        float fov_rad = degree_to_rad(fov);
+        float half_fov = fov_rad / 2.0f;
+
+        // Correct for fisheye effect
+        float perp_dist = sprite_dist * cos(sprite_angle);
+
+        // Adjust for half-screen rendering
+        int render_width = screen_width / 2;       // The width of the 3D rendering area
+        int render_x_offset = screen_width / 2;    // The x offset where rendering starts
+
+        // Calculate projection plane distance
+        float projection_plane_distance = (render_width / 2.0f) / tan(half_fov);
+
+        // Calculate sprite height on screen
+        // TODO: NEED TO SCALE APPROPRIATELY... IF BIGGER SCREEN, BIGGER CELL SIZE. (something to think about.)
+        int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
+
+        // Calculate sprite width on screen
+        int sprite_screen_width = (int)((cell_size / perp_dist) * projection_plane_distance);
+
+        // Calculate sprite's top Y position on screen
+        int sprite_screen_top_y = (screen_height / 2) - (sprite_screen_height / 2);
+
+        // Calculate the horizontal position of the sprite on screen
+        float sprite_screen_x = render_x_offset + (render_width / 2) + (tan(sprite_angle) * projection_plane_distance) - (sprite_screen_width / 2);
+
+        // Determine the start and end X positions on screen
+        int sprite_screen_x_start = (int)sprite_screen_x;
+        int sprite_screen_x_end = sprite_screen_x_start + sprite_screen_width;
+
+        // Clip sprite horizontally to the rendering area
+        if (sprite_screen_x_start < render_x_offset) sprite_screen_x_start = render_x_offset;
+        if (sprite_screen_x_end > screen_width) sprite_screen_x_end = screen_width;
+        
+
+        // Render the sprite column by column
+        for (int x = sprite_screen_x_start; x < sprite_screen_x_end; x++)
+        {
+            // Calculate the corresponding texture X coordinate
+            int tex_x = (int)((x - sprite_screen_x) * sprite.texture_width / sprite_screen_width);
+            // Depth buffer check
+            int buffer_index = x - render_x_offset;
+            if (buffer_index >= 0 && buffer_index < render_width)
             {
-            
-                // Render the sprite column by column
-                SDL_Rect src_rect = { tex_x, 0, 1, texHeight };
-                SDL_Rect dest_rect = { x, sprite_screen_top_y, 1, sprite_screen_height };
-                // SDL_RenderDrawRect(renderer, &dest_rect);
-                SDL_RenderCopy(renderer, sprite_texture, &src_rect, &dest_rect);
+                if (perp_dist < depth_buffer[buffer_index])
+                {
+                
+                    // Render the sprite column by column
+                    SDL_Rect src_rect = { tex_x, 0, 1, sprite.texture_height };
+                    SDL_Rect dest_rect = { x, sprite_screen_top_y, 1, sprite_screen_height };
+                    // SDL_RenderDrawRect(renderer, &dest_rect);
+                    SDL_RenderCopy(renderer, sprite_texture[sprite.texture_index], &src_rect, &dest_rect);
+                }
             }
         }
     }
@@ -595,15 +619,17 @@ int main()
     arr[1] = wall_texture1;
     arr[2] = wall_texture2;
 
-    // SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/light50.png");
-    // SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/monster.png");
-    SDL_Texture* monster_texture = LoadTexture("../_levels/level_1/map/wall_textures/table64.png");
+    SDL_Texture* monster_texture1 = LoadTexture("../_levels/level_1/map/wall_textures/light50.png");
+    SDL_Texture* monster_texture2 = LoadTexture("../_levels/level_1/map/wall_textures/monster.png");
+    SDL_Texture* monster_texture3 = LoadTexture("../_levels/level_1/map/wall_textures/table64.png");
 
 
-    SDL_Texture* m_arr[1];
-    m_arr[0] = monster_texture;
+    SDL_Texture* m_arr[3];
+    m_arr[0] = monster_texture1;
+    m_arr[1] = monster_texture2;
+    m_arr[2] = monster_texture3;
     int m_width, m_height;
-    SDL_QueryTexture(monster_texture, nullptr, nullptr, &m_width, &m_height); 
+    SDL_QueryTexture(monster_texture1, nullptr, nullptr, &m_width, &m_height); 
 
 
 
@@ -621,8 +647,8 @@ int main()
     // init enemies
     std::vector<Sprite> enemies = {
         {100.0, 100.0, 0, 0, 5},
-        {200.0, 250.0, 0, 0, 5},
-        {250.0, 50.0, 0, 0, 5}
+        {200.0, 250.0, 0, 1, 5},
+        {125.0, 200.0, 0, 2, 5}
     };
 
     float player_angle = 0.0f;
@@ -686,7 +712,7 @@ int main()
         DrawRays(player.pos.x, player.pos.y, player_angle, &player, 100, 60, arr, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
         draw_enemies_on_overhead(enemies);
-        draw_sprite(enemies[0], RaygineRenderer::GetRenderer(), player, m_arr[0], window_width, window_height, 60);
+        draw_sprite(enemies, RaygineRenderer::GetRenderer(), player, m_arr, window_width, window_height, 60);
         RaygineRenderer::DrawMap(map);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());
     }
