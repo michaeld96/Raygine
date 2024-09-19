@@ -16,6 +16,7 @@ const int window_width = 800;
 const int window_height = 400;
 const int cell_size = 50;
 const float PI = 3.14159265359;
+float depth_buffer[window_width / 2];
 
 using namespace Raygine;
 
@@ -245,7 +246,10 @@ void DrawRays(float player_x, float player_y, float player_angle, Player* player
 {
     int height_adjustment = 400;
     float player_height = 0.5f;
-    float angle_step = fov / float(num_rays - 1);
+    // HOT TAKE: So, I have been rendering walls based on the width of the requested rectangle... I don't know
+    //           if I want keep on supporting that. Who wants a chunky raycaster? Can just change to, the number
+    //           of rays is just the width of the screen. Will think about this.
+    float angle_step = fov / float((num_rays) - 1);
     // float projection_plane_distance = (window_width / 2.0f) / tan(degree_to_rad(fov / 2.0f));
     // This is with some odd scaling factor... This seems to effect the height. Subtracting a large value makes the height lower.
     // Wondering if I need player height? 
@@ -661,11 +665,9 @@ int main()
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 60, arr, arr, texWidth, texHeight);
+        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 400, 60, arr, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
         draw_enemies_on_overhead(enemies);
-        // draw_sprites(enemies, player);
-        // DrawSprites(&player, enemies, m_arr, m_width, m_height, 60, 400);
         draw_sprite(enemies[0], RaygineRenderer::GetRenderer(), player, m_arr[0], window_width, window_height, 60);
         RaygineRenderer::DrawMap(map);
         SDL_RenderPresent(RaygineRenderer::GetRenderer());

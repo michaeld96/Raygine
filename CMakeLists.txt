@@ -20,8 +20,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 if (APPLE)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
-    include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
-    link_directories(/usr/local/lib)
+    # include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
+    # link_directories(/usr/local/lib)
 elseif (UNIX)
     # Find SDL2 using pkg-config
     find_package(PkgConfig REQUIRED)
@@ -34,7 +34,7 @@ endif()
 # Include directories.
 include_directories(${PROJECT_SOURCE_DIR}/include
                     ${SDL2_INCLUDE_DIRS}
-                    ${SDL2IMAGE_INCLUDE_DIRS}
+                    ${SDL2_IMAGE_INCLUDE_DIRS}
                     ${PROJECT_SOURCE_DIR}/test
                     ${PROJECT_SOURCE_DIR}/libs)
 
@@ -47,7 +47,7 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 # Link SDL2 to the executable using the imported target
 target_link_libraries(${PROJECT_NAME} 
                       ${SDL2_LIBRARIES}
-                      ${SDL2IMAGE_LIBRARIES})
+                      ${SDL2_IMAGE_LIBRARIES})
 
 # Adding custom target to run the executable, "make run".
 add_custom_target(
