@@ -20,97 +20,97 @@ float depth_buffer[window_width / 2];
 
 using namespace Raygine;
 
-std::vector<std::vector<int>> map = {
-    {1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 1, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 1},
-    {1, 0, 1, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1}
-};
-
-std::vector<std::vector<int>> bottom = {
-    {2, 2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2, 2},
-    {2, 2, 2, 2, 2, 2, 2, 2}
-};
-
-std::vector<std::vector<int>> top = {
-    {0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 3, 3, 3, 3, 3, 3, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0}
-};
-
 // std::vector<std::vector<int>> map = {
-//     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+//     {1, 1, 1, 1, 1, 1, 1, 1},
+//     {1, 0, 0, 0, 0, 0, 0, 1},
+//     {1, 0, 0, 0, 1, 0, 0, 1},
+//     {1, 0, 0, 0, 0, 0, 0, 1},
+//     {1, 0, 0, 0, 0, 0, 1, 1},
+//     {1, 0, 1, 0, 0, 0, 0, 1},
+//     {1, 0, 0, 0, 0, 0, 0, 1},
+//     {1, 1, 1, 1, 1, 1, 1, 1}
 // };
 
-// // Need to have floor extend to the walls. If not, player can see the black
-// // -ness of the void. :|
 // std::vector<std::vector<int>> bottom = {
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-//     {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2},
+//     {2, 2, 2, 2, 2, 2, 2, 2}
 // };
 
 // std::vector<std::vector<int>> top = {
-//     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-//     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+//     {0, 0, 0, 0, 0, 0, 0, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 3, 3, 3, 3, 3, 3, 0},
+//     {0, 0, 0, 0, 0, 0, 0, 0}
 // };
+
+std::vector<std::vector<int>> map = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+};
+
+// Need to have floor extend to the walls. If not, player can see the black
+// -ness of the void. :|
+std::vector<std::vector<int>> bottom = {
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+};
+
+std::vector<std::vector<int>> top = {
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+};
 
 
 void InitSDL();
@@ -153,6 +153,7 @@ typedef struct {
     int texture_width;
     int texture_height;
     float dist_from_player;
+    float scale;
 } Sprite;
 
 HitInfo DrawRay(Vec2<float> ray_dir, Player* player)
@@ -458,14 +459,17 @@ void draw_sprite(std::vector<Sprite> sprites, SDL_Renderer* renderer, Player &pl
         float projection_plane_distance = (render_width / 2.0f) / tan(half_fov);
 
         // Calculate sprite height on screen
-        // TODO: NEED TO SCALE APPROPRIATELY... IF BIGGER SCREEN, BIGGER CELL SIZE. (something to think about.)
+        // TODO: NEED TO SCALE APPROPRIATELY... Could resize images to cell size? Then if I do that I make it square.
         int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
-
+        int sprite_screen_width = sprite_screen_height;
         // Calculate sprite width on screen
-        int sprite_screen_width = (int)((cell_size / perp_dist) * projection_plane_distance);
+        // int sprite_screen_width = (int)((cell_size / perp_dist) * projection_plane_distance);
+        // int sprite_screen_height = (int)(((sprite.texture_height * sprite.scale) / perp_dist) * projection_plane_distance);
+        // int sprite_screen_width = (int)(((sprite.texture_width * sprite.scale) / perp_dist) * projection_plane_distance);
 
         // Calculate sprite's top Y position on screen
         int sprite_screen_top_y = (screen_height / 2) - (sprite_screen_height / 2);
+        // int sprite_screen_top_y = screen_height - sprite_screen_height;
 
         // Calculate the horizontal position of the sprite on screen
         float sprite_screen_x = render_x_offset + (render_width / 2) + (tan(sprite_angle) * projection_plane_distance) - (sprite_screen_width / 2);
@@ -620,8 +624,8 @@ int main()
     arr[2] = wall_texture2;
 
     SDL_Texture* monster_texture1 = LoadTexture("../_levels/level_1/map/wall_textures/light50.png");
-    SDL_Texture* monster_texture2 = LoadTexture("../_levels/level_1/map/wall_textures/monster.png");
-    SDL_Texture* monster_texture3 = LoadTexture("../_levels/level_1/map/wall_textures/table64.png");
+    SDL_Texture* monster_texture2 = LoadTexture("../_levels/level_1/map/wall_textures/monster50.png");
+    SDL_Texture* monster_texture3 = LoadTexture("../_levels/level_1/map/wall_textures/table50.png");
 
 
     SDL_Texture* m_arr[3];
@@ -650,6 +654,9 @@ int main()
         {200.0, 250.0, 0, 1, 5},
         {125.0, 200.0, 0, 2, 5}
     };
+    enemies[0].scale = 0.1f;
+    enemies[1].scale = 0.2f;
+    enemies[2].scale = 0.7f;
 
     float player_angle = 0.0f;
 
@@ -709,7 +716,7 @@ int main()
         std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
         std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
 #endif
-        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 100, 60, arr, arr, texWidth, texHeight);
+        DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 60, arr, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
         draw_enemies_on_overhead(enemies);
         draw_sprite(enemies, RaygineRenderer::GetRenderer(), player, m_arr, window_width, window_height, 60);
