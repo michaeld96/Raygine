@@ -12,8 +12,8 @@
 
 #define DEBUG
 
-const int window_width = 800;
-const int window_height = 400;
+const int window_width = 1200;
+const int window_height = 800;
 const int cell_size = 50;
 const float PI = 3.14159265359;
 float depth_buffer[window_width / 2];
@@ -460,12 +460,12 @@ void draw_sprite(std::vector<Sprite> sprites, SDL_Renderer* renderer, Player &pl
 
         // Calculate sprite height on screen
         // TODO: NEED TO SCALE APPROPRIATELY... Could resize images to cell size? Then if I do that I make it square.
-        int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
-        int sprite_screen_width = sprite_screen_height;
+        // int sprite_screen_height = (int)((cell_size / perp_dist) * projection_plane_distance);
+        // int sprite_screen_width = sprite_screen_height
         // Calculate sprite width on screen
         // int sprite_screen_width = (int)((cell_size / perp_dist) * projection_plane_distance);
-        // int sprite_screen_height = (int)(((sprite.texture_height * sprite.scale) / perp_dist) * projection_plane_distance);
-        // int sprite_screen_width = (int)(((sprite.texture_width * sprite.scale) / perp_dist) * projection_plane_distance);
+        int sprite_screen_height = (int)(((sprite.texture_height * sprite.scale) / perp_dist) * projection_plane_distance);
+        int sprite_screen_width = (int)(((sprite.texture_width * sprite.scale) / perp_dist) * projection_plane_distance);
 
         // Calculate sprite's top Y position on screen
         int sprite_screen_top_y = (screen_height / 2) - (sprite_screen_height / 2);
@@ -498,7 +498,7 @@ void draw_sprite(std::vector<Sprite> sprites, SDL_Renderer* renderer, Player &pl
                     // Render the sprite column by column
                     SDL_Rect src_rect = { tex_x, 0, 1, sprite.texture_height };
                     SDL_Rect dest_rect = { x, sprite_screen_top_y, 1, sprite_screen_height };
-                    // SDL_RenderDrawRect(renderer, &dest_rect);
+                    SDL_RenderDrawRect(renderer, &dest_rect);
                     SDL_RenderCopy(renderer, sprite_texture[sprite.texture_index], &src_rect, &dest_rect);
                 }
             }
@@ -624,8 +624,8 @@ int main()
     arr[2] = wall_texture2;
 
     SDL_Texture* monster_texture1 = LoadTexture("../_levels/level_1/map/wall_textures/light50.png");
-    SDL_Texture* monster_texture2 = LoadTexture("../_levels/level_1/map/wall_textures/monster50.png");
-    SDL_Texture* monster_texture3 = LoadTexture("../_levels/level_1/map/wall_textures/table50.png");
+    SDL_Texture* monster_texture2 = LoadTexture("../_levels/level_1/map/wall_textures/monster.png");
+    SDL_Texture* monster_texture3 = LoadTexture("../_levels/level_1/map/wall_textures/table64.png");
 
 
     SDL_Texture* m_arr[3];
@@ -654,9 +654,9 @@ int main()
         {200.0, 250.0, 0, 1, 5},
         {125.0, 200.0, 0, 2, 5}
     };
-    enemies[0].scale = 0.1f;
-    enemies[1].scale = 0.2f;
-    enemies[2].scale = 0.7f;
+    enemies[0].scale = 0.1f; // light
+    enemies[1].scale = 0.3f; // monster
+    enemies[2].scale = 1.2f; // table
 
     float player_angle = 0.0f;
 
