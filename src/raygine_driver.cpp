@@ -548,6 +548,9 @@ int main()
         exit(1);
     }
 
+    // init mouse.
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+
     // Initialize window and renderer
     RaygineRenderer::InitWindow(window_width, window_height);
     RaygineRenderer::CreateRenderer();
@@ -661,51 +664,54 @@ int main()
     float player_angle = 0.0f;
 
     SDL_Event e;
-    bool quit = false;
+    bool quit               = false;
+    bool moving_forward     = false;
+    bool moving_backwards   = false;
+    bool rotating_left      = false;
+    bool rotating_right     = false;
     while (!quit)
     {
-        // Input
+        // Input.
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT)
             {
                 quit = true;
             }
-            if (e.type == SDL_KEYDOWN)
+            else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
             {
-                switch (e.key.keysym.sym)
-                {
-                    case SDLK_w: // Move forward
-                    {
-                        player.pos.x += player.dir.x * 5;
-                        player.pos.y += player.dir.y * 5;
-                    }
-                    break;
-                    case SDLK_s: // Move backward
-                    {
-                        player.pos.x -= player.dir.x * 5;
-                        player.pos.y -= player.dir.y * 5;
-                    }
-                    break;
-                    case SDLK_a: // Rotate left (counter-clockwise)
-                    {
-                        float neg_rotation_constant = -2;
-                        player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(neg_rotation_constant));
-                    }
-                    break;
-                    case SDLK_d:  // Rotate right (clockwise)
-                    {
-                        float rotation_constant = 2;
-                        player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));
-                    }
-                    break;
-                    case SDLK_ESCAPE:
-                    {
-                        quit = true;
-                    }
-                    break;
-                }
+                const Uint8* current_key_states = SDL_GetKeyboardState(NULL);
+                moving_forward = current_key_states[SDL_SCANCODE_W];
+                moving_backwards = current_key_states[SDL_SCANCODE_S];
+                rotating_left = current_key_states[SDL_SCANCODE_A];
+                rotating_right = current_key_states[SDL_SCANCODE_D];
+                quit = current_key_states[SDL_SCANCODE_ESCAPE];
             }
+            else if  (e.type == SDL_MOUSEMOTION)
+            {
+                float rotation_constant = e.motion.xrel * 0.06;
+                player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));  
+            }
+        }
+        if (moving_forward)
+        {
+            player.pos.x += player.dir.x * 5;
+            player.pos.y += player.dir.y * 5;
+        }
+        if (moving_backwards)
+        {
+            player.pos.x -= player.dir.x * 5;
+            player.pos.y -= player.dir.y * 5;
+        }
+        if (rotating_left)
+        {
+            float neg_rotation_constant = -2;
+            player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(neg_rotation_constant));
+        }
+        if (rotating_right)
+        {
+            float neg_rotation_constant = 2;
+            player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(neg_rotation_constant));
         }
         // Update.
         // Render.
