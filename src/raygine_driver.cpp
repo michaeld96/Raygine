@@ -691,7 +691,7 @@ int main()
         SDL_GetRelativeMouseState(&mouse_xrel, &mouse_yrel);
 
         float rotation_constant = mouse_xrel * mouse_sensitivity;
-            player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));
+        player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));
 
         // **Update Keyboard Input States Every Frame**
         const Uint8* current_key_states = SDL_GetKeyboardState(NULL);
