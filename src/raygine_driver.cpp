@@ -669,9 +669,11 @@ int main()
     bool moving_backwards   = false;
     bool rotating_left      = false;
     bool rotating_right     = false;
+    const float mouse_sensitivity = 0.06f; // Adjust as needed.
+    const float move_speed = 5.0f;          // Units per frame or per second if using delta time. TODO: Need to add tick...
+    const float rotation_speed = 2.0f;   
     while (!quit)
     {
-        // Input.
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT)
@@ -680,38 +682,46 @@ int main()
             }
             else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
             {
-                const Uint8* current_key_states = SDL_GetKeyboardState(NULL);
-                moving_forward = current_key_states[SDL_SCANCODE_W];
-                moving_backwards = current_key_states[SDL_SCANCODE_S];
-                rotating_left = current_key_states[SDL_SCANCODE_A];
-                rotating_right = current_key_states[SDL_SCANCODE_D];
-                quit = current_key_states[SDL_SCANCODE_ESCAPE];
-            }
-            else if  (e.type == SDL_MOUSEMOTION)
-            {
-                float rotation_constant = e.motion.xrel * 0.06;
-                player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));  
+                // Key states will be updated below.
             }
         }
+
+        // **Capture Mouse Movement Every Frame**
+        int mouse_xrel = 0, mouse_yrel = 0;
+        SDL_GetRelativeMouseState(&mouse_xrel, &mouse_yrel);
+
+        float rotation_constant = mouse_xrel * mouse_sensitivity;
+            player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));
+
+        // **Update Keyboard Input States Every Frame**
+        const Uint8* current_key_states = SDL_GetKeyboardState(NULL);
+        moving_forward   = current_key_states[SDL_SCANCODE_W];
+        moving_backwards = current_key_states[SDL_SCANCODE_S];
+        rotating_left    = current_key_states[SDL_SCANCODE_A];
+        rotating_right   = current_key_states[SDL_SCANCODE_D];
+        if (current_key_states[SDL_SCANCODE_ESCAPE])
+            quit = true;
+
+        // **Movement and Rotation Updates**
         if (moving_forward)
         {
-            player.pos.x += player.dir.x * 5;
-            player.pos.y += player.dir.y * 5;
+            player.pos.x += player.dir.x * move_speed;
+            player.pos.y += player.dir.y * move_speed;
         }
         if (moving_backwards)
         {
-            player.pos.x -= player.dir.x * 5;
-            player.pos.y -= player.dir.y * 5;
+            player.pos.x -= player.dir.x * move_speed;
+            player.pos.y -= player.dir.y * move_speed;
         }
         if (rotating_left)
         {
-            float neg_rotation_constant = -2;
-            player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(neg_rotation_constant));
+            float rotation_constant = -rotation_speed;
+            player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));
         }
         if (rotating_right)
         {
-            float neg_rotation_constant = 2;
-            player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(neg_rotation_constant));
+            float rotation_constant = rotation_speed;
+            player.dir = RotationMatrix2D<float>(player.dir, degree_to_rad(rotation_constant));
         }
         // Update.
         // Render.
@@ -719,8 +729,9 @@ int main()
         RaygineRenderer::ClearRenderer();
         
 #ifdef DEBUG
-        std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
-        std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
+        // std::cout << "x: " << player.pos.x << ", y: " << player.pos.y << ", angle: " << player_angle << "\n";
+        // std::cout << "delta_x: " << player.dir.x << ", delta_y: " << player.dir.y << std::endl;
+        std::cout << "rotation constant: " << rotation_constant << "\n";
 #endif
         DrawRays(player.pos.x, player.pos.y, player_angle, &player, 200, 60, arr, arr, texWidth, texHeight);
         RaygineRenderer::DrawPlayer(player.pos, player.dir);
