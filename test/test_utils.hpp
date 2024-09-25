@@ -40,7 +40,17 @@ enum StringOutputColor
     GREEN
 };
 
-std::unordered_map<std::string, std::function<bool()>> FunctionNameAndPointers;
+std::unordered_map<std::string, std::function<void()>> FunctionNameAndPointers;
+
+const char * _header_footer = "**********************************\n";
+
+int _num_tests;
+int _num_passes;
+int _num_fails;
+
+int _total_num_tests;
+int _total_num_passes;
+int _total_num_fails;
 
 /* FUNCTIONS */
 
@@ -84,7 +94,7 @@ void TestOutput(const std::string& message, StringOutputColor color)
  * @param func_names A pointer to an array of function names to be loaded.
  * @param size The size of the array.
  */
-void LoadFunctions(const std::vector<std::string> func_names, const std::vector<std::function<bool()>> func_ptrs)
+void LoadFunctions(const std::vector<std::string> func_names, const std::vector<std::function<void()>> func_ptrs)
 {
     for (size_t i = 0; i < func_names.size(); ++i)
     {
@@ -137,11 +147,13 @@ void RunTest(std::string func_name)
 {
     if (FunctionNameAndPointers.find(func_name) != FunctionNameAndPointers.end())
     {
+        std::cout << _header_footer;
         // Run the function.
         std::cout << "Running test on '" << func_name << "'...\n";
         auto _func_ptr_itr = FunctionNameAndPointers.find(func_name);
-        bool result =_func_ptr_itr->second();
+        _func_ptr_itr->second();
         std::cout << "Done running test on '" << func_name << "'\n";
+        std::cout << _header_footer;
     }
     else
     {
@@ -170,7 +182,7 @@ void RunAllTests(void)
         "\nFile: " << __FILE__ << "\nLine: " << __LINE__            \
         << "\nCondition " << #condition << " is false";             \
         TestOutput(oss.str(), TestUtils::StringOutputColor::RED);   \
-        return false;                                               \
+                                                       \
     }                                                               \
     else {                                                          \
         oss << "SUCCESS: Test passed for function: " << __func__    \
@@ -187,7 +199,7 @@ void RunAllTests(void)
         "\nFile: " << __FILE__ << "\nLine: " << __LINE__ << "\n"    \
         << #cond_1 << " != " << #cond_2;                            \
         TestOutput(oss.str(), TestUtils::StringOutputColor::RED);   \
-        return false;                                               \
+                                            \
     }                                                               \
     else {                                                          \
         oss << "SUCCESS: Test passed for function '" << __func__    \
