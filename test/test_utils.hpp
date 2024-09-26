@@ -39,23 +39,23 @@ enum StringOutputColor
     RED,
     GREEN
 };
-
 std::unordered_map<std::string, std::function<void()>> FunctionNameAndPointers;
-
+/* CONSTANTS */
 const char * _header_footer = "**********************************\n";
+const char * _test_summary_header = "********** Test Summary **********\n";
 
-int _num_tests;
-int _num_passes;
-int _num_fails;
+/* VARIABLES */
+int _num_passed;
+int _num_failed;
 
-int _total_num_tests;
-int _total_num_passes;
-int _total_num_fails;
+bool _running_all_tests = false;
+int _total_num_passed;
+int _total_num_failed;
 
 /* FUNCTIONS */
 
 /**
- * @brief USED FOR INTERNAL USE!
+ * @brief \b ONLY \b USED \b FOR \b INTERNAL \b USE!
  * This function "renders" testing output with a specific color. Each of these colors
  * is specified with the `StringOutputColor` which can be `RED` or `GREEN`.
  * @param message A string that you want to be displayed to the console.
@@ -86,6 +86,33 @@ void TestOutput(const std::string& message, StringOutputColor color)
             break;
         }
     }
+}
+/**
+ * @brief \b ONLY \b USED \b FOR \b INTERNAL \b USE!
+ *        Prints the number of passed and failed asserts that were
+ *        present in the test. Will print out green for passed tests
+ *        and red for failed tests.
+ */
+void PrintTestSummary(void)
+{
+    TestOutput("Test(s) Passed: " + std::to_string(_num_passed),
+                                            StringOutputColor::GREEN);
+    TestOutput("Test(s) Failed: " + std::to_string(_num_failed), 
+                                            StringOutputColor::RED);
+}
+/**
+ * @brief \b ONLY \b USED \b FOR \b INTERNAL \b USE!
+ *        Prints the total number of tests that passed or failed. This function will 
+ *        only be ran if `RunAllTest()` is called.
+ */
+void PrintTotalTestSummary(void)
+{
+    std::cout <<_test_summary_header;
+    TestOutput("Total Test(s) Passed: " + std::to_string(_total_num_passed),
+                                                StringOutputColor::GREEN);
+    TestOutput("Total Test(s) Failed: " + std::to_string(_total_num_failed), 
+                                                StringOutputColor::RED);
+    std::cout << _header_footer;
 }
 /**
  * @brief Loads function names into a hash map. If a duplicate function name is found,
@@ -145,32 +172,44 @@ void RemoveAllFunctions()
  */
 void RunTest(std::string func_name)
 {
+    std::cout << _header_footer;
+    _num_passed = 0;
+    _num_failed = 0;
     if (FunctionNameAndPointers.find(func_name) != FunctionNameAndPointers.end())
     {
-        std::cout << _header_footer;
         // Run the function.
         std::cout << "Running test on '" << func_name << "'...\n";
         auto _func_ptr_itr = FunctionNameAndPointers.find(func_name);
         _func_ptr_itr->second();
         std::cout << "Done running test on '" << func_name << "'\n";
-        std::cout << _header_footer;
     }
     else
     {
         TestOutput("ERROR: Function '" + func_name + "' was not found.", StringOutputColor::RED);
     }
+    if (_running_all_tests)
+    {
+        _total_num_passed += _num_passed;
+        _total_num_failed += _num_failed;
+    }
+    PrintTestSummary();
+
 }
 
 /**
- * @brief This function will run all tests
+ * @brief This function will run all tests and prints a summary of all the 
+ *        tests that were ran (showing the number of passing and failing tests).
  */
 void RunAllTests(void)
 {
+    _running_all_tests = true;
     for (auto& pair : FunctionNameAndPointers)
     {
         // Get the function name and run it in RunFunction.
         RunTest(pair.first);
     }
+    std::cout << _header_footer;
+    PrintTotalTestSummary();
 }
 
 /* MACROS */
@@ -182,12 +221,13 @@ void RunAllTests(void)
         "\nFile: " << __FILE__ << "\nLine: " << __LINE__            \
         << "\nCondition " << #condition << " is false";             \
         TestOutput(oss.str(), TestUtils::StringOutputColor::RED);   \
-                                                       \
+        TestUtils::_num_failed++;                                   \
     }                                                               \
     else {                                                          \
         oss << "SUCCESS: Test passed for function: " << __func__    \
         << "'";                                                     \
         TestOutput(oss.str(), TestUtils::StringOutputColor::GREEN); \
+        TestUtils::_num_passed++;                                   \
     }                                                               \
 } while (0)
 
@@ -199,12 +239,13 @@ void RunAllTests(void)
         "\nFile: " << __FILE__ << "\nLine: " << __LINE__ << "\n"    \
         << #cond_1 << " != " << #cond_2;                            \
         TestOutput(oss.str(), TestUtils::StringOutputColor::RED);   \
-                                            \
+        TestUtils::_num_failed++;                                   \
     }                                                               \
     else {                                                          \
         oss << "SUCCESS: Test passed for function '" << __func__    \
         << "'";                                                     \
         TestOutput(oss.str(), TestUtils::StringOutputColor::GREEN); \
+        TestUtils::_num_passed++;                                   \
     }                                                               \
 } while (0)
 
