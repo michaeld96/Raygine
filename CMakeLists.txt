@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.27)
 project(Raygine VERSION 0.1)
 
 # Set the C++ Standard.
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Define build types.
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 # Set default build type to Debug if not specified.
 if (NOT CMAKE_BUILD_TYPE)
@@ -11,7 +14,8 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Ensure debug symbols are included.
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
 
 # Find pkg-config.
 find_package(PkgConfig REQUIRED)
