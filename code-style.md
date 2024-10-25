@@ -29,7 +29,7 @@ Methods will always be capitalized.
 Player.TakeDamage(10);
 ```
 
-## Internal Class Variables
+## Internal Class Variables (Fields)
 These variables will always have an underscore in-front of their name.
 ```cpp
 class Player
